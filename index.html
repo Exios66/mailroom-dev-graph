@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>mailroom-dev · knowledge graph</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://unpkg.com/vis-network@9.1.6/standalone/css/vis-network.min.css">
+<link rel="stylesheet" href="https://unpkg.com/vis-network@9.1.6/styles/vis-network.min.css">
 <script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -13,22 +13,38 @@
   header { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:#0e0e14; border-bottom:1px solid #1f2533; position:relative; z-index:10; }
   .brand { font-weight:700; font-size:14px; color:#e4ecfa; white-space:nowrap; }
   .brand small { font-weight:400; opacity:.5; margin-left:6px; font-size:11px; }
-  #stats { max-width:620px; width:100%; text-align:right; font-size:11px; line-height:1.55; color:#6b7a8f; overflow:hidden; }
+  #stats { max-width:640px; width:100%; text-align:right; font-size:11px; line-height:1.55; color:#6b7a8f; overflow:hidden; }
   #stats a { color:#4a7fc9; text-decoration:none; }
-  #searchbox-wrap { position:absolute; top:52px; left:16px; z-index:20; }
+  #searchbox-wrap { position:absolute; top:56px; left:16px; z-index:20; }
   #searchbox { width:240px; padding:8px 10px; background:#131320; border:1px solid #2a2f40; border-radius:8px; color:#c8d0dc; font-size:13px; outline:none; transition:border-color .2s; }
   #searchbox:focus { border-color:#34d399; }
-  #legend { position:absolute; bottom:16px; left:16px; background:#0e0e14ee; border:1px solid #1f2533; border-radius:10px; padding:14px 18px; min-width:220px; font-size:12px; z-index:15; }
+  #legend { position:absolute; bottom:34px; left:16px; background:#0e0e14ee; border:1px solid #1f2533; border-radius:10px; padding:14px 18px; min-width:230px; font-size:12px; z-index:15; max-height:45vh; overflow:auto; }
   #legend h3 { font-size:13px; font-weight:600; color:#e4ecfa; margin-bottom:10px; letter-spacing:.4px; }
-  .layer-item { display:flex; align-items:center; gap:8px; padding:4px 0; cursor:pointer; }
-  .layer-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .layer-item { display:flex; align-items:center; gap:8px; padding:4px 0; cursor:pointer; user-select:none; }
+  .layer-item:hover .layer-label { color:#e4ecfa; }
+  .layer-item.off .layer-label { color:#4a5160; text-decoration:line-through; }
+  .layer-item.off .layer-dot { opacity:.25; }
+  .layer-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; transition:opacity .2s; }
   .layer-label { color:#b0bcc8; flex:1; }
-  .layer-count { color:#555; font-size:11px; }
-  .tooltip { position:absolute; background:#16162a; border:1px solid #2a2f40; border-radius:6px; padding:10px 14px; font-size:12px; pointer-events:none; z-index:20; max-width:280px; color:#c8d0dc; box-shadow:0 4px 12px rgba(0,0,0,.4); display:none; }
-  .tooltip .tt-title { font-weight:600; color:#e4ecfa; margin-bottom:4px; }
+  .layer-count { color:#555f70; font-size:11px; }
+  .tooltip { position:absolute; background:#16162a; border:1px solid #2a2f40; border-radius:6px; padding:10px 14px; font-size:12px; pointer-events:none; z-index:30; max-width:300px; color:#c8d0dc; box-shadow:0 4px 12px rgba(0,0,0,.4); display:none; white-space:pre-line; }
+  .tooltip .tt-title { font-weight:600; color:#e4ecfa; margin-bottom:4px; white-space:normal; }
   .tooltip .tt-meta { color:#6b7a8f; font-size:11px; }
-  #graph { width:100%; height:calc(100vh - 52px); position:absolute; top:52px; left:0; } footer { position:fixed; bottom:0; left:0; right:0; text-align:center; padding:6px; background:#0a0a0fcc; color:#3a4255; font-size:10px; z-index:10; }
-  @media(max-width:800px){ header{padding:8px 12px} #searchbox-wrap{top:48px;left:12px} #legend{bottom:8px;left:8px;padding:10px 14px} #stats{text-align:left;margin-top:0;width:auto;max-width:none} .brand{font-size:13px} #graph{height:calc(100vh - 48px)} }
+  #graph { width:100%; height:calc(100vh - 52px); position:absolute; top:52px; left:0; }
+  footer { position:fixed; bottom:0; left:0; right:0; text-align:center; padding:6px; background:#0a0a0fcc; color:#3a4255; font-size:10px; z-index:10; }
+  #pipeline-strip { position:absolute; top:56px; left:50%; transform:translateX(-50%); z-index:15; display:flex; align-items:center; gap:4px; background:#0e0e14ee; border:1px solid #1f2533; border-radius:10px; padding:6px 10px; max-width:min(860px, calc(100vw - 300px)); overflow-x:auto; scrollbar-width:none; }
+  #pipeline-strip::-webkit-scrollbar { display:none; }
+  .pipe-step { flex-shrink:0; padding:4px 9px; border-radius:7px; font-size:11px; color:#8fa0b4; cursor:pointer; border:1px solid transparent; transition:all .15s; white-space:nowrap; }
+  .pipe-step:hover { color:#e4ecfa; background:#1a2030; }
+  .pipe-step.active { color:#34d399; border-color:#34d39955; background:#12241d; }
+  .pipe-step.missing { opacity:.35; cursor:not-allowed; }
+  .pipe-arrow { color:#333c4e; font-size:10px; flex-shrink:0; user-select:none; }
+  #isolate-bar { position:absolute; top:56px; right:16px; z-index:20; display:none; align-items:center; gap:10px; background:#0e0e14ee; border:1px solid #2a2f40; border-radius:10px; padding:8px 12px; font-size:12px; color:#c8d0dc; }
+  #isolate-bar .iso-label { color:#34d399; font-weight:600; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #isolate-bar button { background:#1a2030; border:1px solid #2a2f40; color:#c8d0dc; border-radius:6px; padding:3px 10px; font-size:11px; cursor:pointer; }
+  #isolate-bar button:hover { border-color:#34d399; color:#34d399; }
+  #status { position:absolute; bottom:34px; right:16px; z-index:15; background:#0e0e14cc; border:1px solid #1f2533; border-radius:8px; padding:5px 12px; font-size:11px; color:#6b7a8f; transition:opacity .4s; }
+  @media(max-width:800px){ header{padding:8px 12px} #searchbox-wrap{top:48px;left:12px} #legend{bottom:30px;left:8px;padding:10px 14px;max-height:32vh} #stats{display:none} .brand{font-size:13px} #graph{height:calc(100vh - 48px)} #pipeline-strip{top:48px;max-width:calc(100vw - 24px)} #isolate-bar{top:96px;right:8px} #status{display:none} }
 </style>
 </head>
 <body>
@@ -36,128 +52,311 @@
   <div class="brand">mailroom-dev<small id="version"></small></div>
   <div id="stats"></div>
 </header>
-<div id="searchbox-wrap"><input type="text" id="searchbox" placeholder="/ search..."></div>
+<div id="searchbox-wrap"><input type="text" id="searchbox" placeholder="/ search..." autocomplete="off" spellcheck="false"></div>
+<div id="pipeline-strip" title="LangGraph pipeline — click a node to jump"></div>
+<div id="isolate-bar"><span>⤧ isolated</span><span class="iso-label" id="iso-label"></span><button id="iso-reset">show all (Esc)</button></div>
 <div id="legend"><h3>Layers</h3><div id="layers-list"></div></div>
 <div id="graph"></div>
 <div class="tooltip" id="tooltip"><div class="tt-title"></div><div class="tt-meta"></div></div>
-<footer>scroll to zoom · drag nodes &middot; click layers to filter</footer>
+<div id="status">physics: stabilizing…</div>
+<footer>scroll to zoom · drag nodes · click a layer to filter · double-click a node to isolate · / to search</footer>
 
 <script src="./data.js"></script>
 <script>
 (function(){
-  // Assemble DATA object from separate variables
-  var DATA = { nodes: graphNodes, edges: graphEdges };
+  'use strict';
+
+  // ---------- data ----------
+  var NODES = graphNodes;
+  var EDGES = graphEdges;
   var LAYERS = graphLayers;
   var PIPELINE = graphPipeline;
-  var GODS = graphGods;
-  var RELS = graphRels;
 
   var commitSha = '998922f0';
   var today = '2026-08-30';
-  document.getElementById('version').innerHTML = commitSha + ' ' + today;
+  var version = 'v1.3.0';
+  document.getElementById('version').innerHTML = version + ' · ' + commitSha + ' · ' + today;
 
-  // Compute degrees
-  var deg={};
-  DATA.edges.forEach(e=>{deg[e.f]=(deg[e.f]||0)+1;deg[e.t]=(deg[e.t]||0)+1});
-  
-  // Build visible node map
-  var hiddenLayers={};
-  function getVisibleNodes(){
-    var ns=DATA.nodes.filter(n=>!hiddenLayers[n.ly]);
-    var count={};ns.forEach(n=>{count[n.ly]=(count[n.ly]||0)+1});
-    return {nodes:ns,counts:count};
+  // Node lookup + layer colors
+  var nodeById = {};
+  NODES.forEach(function(n){ nodeById[n.id] = n; });
+  var layerColor = {};
+  LAYERS.forEach(function(L){ layerColor[L.id] = L.color; });
+
+  // Degree over VALID edges only (1,786 edges dangle; drop them once, up front)
+  var VALID_EDGES = EDGES.filter(function(e){ return nodeById[e.f] && nodeById[e.t]; });
+  var deg = {};
+  VALID_EDGES.forEach(function(e){
+    deg[e.f] = (deg[e.f] || 0) + 1;
+    deg[e.t] = (deg[e.t] || 0) + 1;
+  });
+
+  // Adjacency index for fast neighborhood / search-highlight lookups
+  var adj = {};
+  VALID_EDGES.forEach(function(e){
+    (adj[e.f] = adj[e.f] || []).push(e.t);
+    (adj[e.t] = adj[e.t] || []).push(e.f);
+  });
+
+  // ---------- visibility state ----------
+  var hiddenLayers = {};
+  var isolated = null;       // node id when a neighborhood is isolated
+  var isolatedNb = null;     // Set of neighbor ids
+
+  function isVisible(n){
+    return !hiddenLayers[n.ly] && (!isolated || isolated === n.id || isolatedNb.has(n.id));
+  }
+  function visibleNodes(){
+    return NODES.filter(isVisible);
   }
 
-  // Network options
-  var options={
-    layout:{randomSeed:42,hierarchical:{enabled:false}},
-    physics:{barnesHut:{gravitationalConstant:-2800,centralGravity:0.3,springLength:120,springConstant:0.008,damping:0.09},minVelocity:0.75},
-    interaction:{hover:true,tooltipDelay:200,zoomView:true,navigationButtons:true,kinetic:{maxVelocity:150,minimumBounceLimit:60,smoothDelay:100,smoothDirection:1,timelineThreshold:50},hideEdgesOnZoom:false,hideNodesOnZoom:false,maxPhysicalIterations:2000,dragNodes:true,dragView:true,clickToUse:true},
-    nodes:{shape:'dot',size:4,font:{size:10,color:'#b0bcc8'},borderWidth:0,shadow:false},
-    edges:{width:0.4,color:{inherit:'direction',opacity:0.15},smooth:{type:'continuous',roundness:0.1},arrows:{to:{enabled:false}},selectionWidth:0},
+  // ---------- vis data ----------
+  var BASE_FONT = { size: 10, color: '#b0bcc8', face: 'Inter, Segoe UI, system-ui, sans-serif' };
+  var DIM_FONT = { size: 10, color: '#39415a', face: BASE_FONT.face };
+
+  function baseColor(n){
+    var c = layerColor[n.ly] || '#64748b';
+    return { background: c, border: c, highlight: { background: '#f8fafc', border: c }, hover: { background: '#f8fafc', border: c } };
+  }
+  function toVisNode(n, pos){
+    var v = {
+      id: n.id,
+      label: n.l,
+      color: baseColor(n),
+      size: Math.max(3, Math.min(14, 3 + Math.sqrt(deg[n.id] || 0))),
+      font: BASE_FONT,
+      borderWidth: 0
+    };
+    if (pos) { v.x = pos.x; v.y = pos.y; }
+    return v;
+  }
+  function toVisEdge(e){
+    return { from: e.f, to: e.t, width: 0.4, color: { inherit: 'both', opacity: 0.12 } };
+  }
+
+  // Preserve layout positions across rebuilds so layer toggles don't scatter the graph
+  function capturePositions(){
+    var pos = network ? network.getPositions() : {};
+    var out = {};
+    nodesDS.forEach(function(n){ if (pos[n.id]) out[n.id] = { x: pos[n.id].x, y: pos[n.id].y }; });
+    return out;
+  }
+
+  var nodesDS = new vis.DataSet(visibleNodes().map(function(n){ return toVisNode(n); }));
+  var initVisible = visibleNodes();
+  var visIds = new Set(initVisible.map(function(n){ return n.id; }));
+  var edgesDS = new vis.DataSet(VALID_EDGES.filter(function(e){ return visIds.has(e.f) && visIds.has(e.t); }).map(toVisEdge));
+
+  // ---------- network ----------
+  var container = document.getElementById('graph');
+  var options = {
+    autoResize: true,
+    layout: { randomSeed: 42 },
+    physics: {
+      solver: 'barnesHut',
+      barnesHut: { gravitationalConstant: -2600, centralGravity: 0.3, springLength: 110, springConstant: 0.02, damping: 0.4, avoidOverlap: 0.1 },
+      stabilization: { enabled: true, iterations: 220, fit: true }
+    },
+    interaction: { hover: true, tooltipDelay: 200, navigationButtons: true, zoomView: true, dragView: true, hideEdgesOnDrag: true, selectConnectedEdges: false },
+    nodes: { shape: 'dot', borderWidth: 0, font: BASE_FONT },
+    edges: { smooth: false, selectionWidth: 1 }
   };
+  var network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, options);
 
-  // Create dataset views
-  var edgesDS=new vis.DataSet(DATA.edges.map(e=>({id:e.f+'_'+e.t,from:e.f,to:e.t,label:e.r!==undefined&&e.r?'':'',group:e.r||'default',physics:true})));
-  var {nodes:allNodes}=getVisibleNodes();
-  var nodesDS=new vis.DataSet(allNodes.map(n=>({...n, PhysicsOptions:true, borderWidth:0, size:Math.max(3,Math.min(12,Math.sqrt(deg[n.id]||0))))})));
-
-  // Network container
-  var container=document.getElementById('graph');
-  var network=new vis.Network(container,{nodes:nodesDS,edges:edgesDS},options);
-
-  // Tooltip
-  var tooltip=document.getElementById('tooltip');
-  network.on('hoverNode',function(p){
-    var n=nodesDS.get(p.node);if(!n)return;
-    tooltip.querySelector('.tt-title').textContent=n.l||n.id;
-    tooltip.querySelector('.tt-meta').textContent='deg: '+(deg[n.id]||0)+'\nid: '+n.id+'\nfile: '+n.sf;
-    tooltip.style.display='block';
+  network.on('stabilizationIterationsDone', function(){
+    var s = document.getElementById('status');
+    if (s) { s.textContent = 'ready · ' + nodesDS.length + ' nodes'; setTimeout(function(){ s.style.opacity = '0'; }, 4000); }
   });
-  network.on('moveNode',function(){});
-  network.on('blurNode',function(){tooltip.style.display='none'});
-  network.on('hoverEdge',function(){});
-  network.on('blurEdge',function(){});
 
-  // Hover styling
-  network.setOptions({nodes:{color:{backgroundColor:'#34d399',border:'#fff'},hover:{backgroundColor:'#4ade80',border:'#fff'}}});
+  // ---------- tooltip ----------
+  var tooltip = document.getElementById('tooltip');
+  var layerTitle = {};
+  LAYERS.forEach(function(L){ layerTitle[L.id] = L.title; });
 
-  // Stats
-  var statsEl=document.getElementById('stats');
-  statsEl.innerHTML=allNodes.length+' production symbols · '+DATA.edges.length+' edges · '+Object.keys(hiddenLayers).length+' hidden layers<br>';
-  statsEl.innerHTML+='%d nodes · %d files · tests/notebooks/.opencode excluded<br>'.replace('%d',allNodes.length).replace('%d',new Set(allNodes.map(n=>n.sf)).size);
-  statsEl.innerHTML+='<kbd>/</kbd> search · <kbd>Esc</kbd> clear';
+  network.on('hoverNode', function(p){
+    var n = nodeById[p.node];
+    if (!n) return;
+    tooltip.querySelector('.tt-title').textContent = n.l;
+    tooltip.querySelector('.tt-meta').textContent =
+      'layer: ' + (layerTitle[n.ly] || n.ly) +
+      '\ndegree: ' + (deg[n.id] || 0) +
+      '\ncommunity: ' + (n.cn || n.c) +
+      '\nfile: ' + (n.sf || '?') + (n.loc ? ' @' + n.loc : '');
+    tooltip.style.display = 'block';
+  });
+  network.on('dragging', function(){ tooltip.style.display = 'none'; });
+  network.on('blurNode', function(){ tooltip.style.display = 'none'; });
 
-  // Legend
-  var legendEl=document.getElementById('layers-list');
-  var allHidden=Object.keys(hiddenLayers).length===0;
+  // ---------- double-click isolate ----------
+  var isoBar = document.getElementById('isolate-bar');
+  var isoLabel = document.getElementById('iso-label');
+
+  function isolateNeighborhood(id){
+    isolated = id;
+    isolatedNb = new Set(adj[id] || []);
+    rebuild({ fit: true });
+    isoLabel.textContent = (nodeById[id] ? nodeById[id].l : id) + ' · ' + isolatedNb.size + ' neighbors';
+    isoBar.style.display = 'flex';
+  }
+  function resetIsolation(skipFit){
+    if (!isolated) return;
+    isolated = null;
+    isolatedNb = null;
+    isoBar.style.display = 'none';
+    rebuild({ fit: !skipFit });
+  }
+  document.getElementById('iso-reset').addEventListener('click', function(){ resetIsolation(); });
+
+  network.on('doubleClick', function(p){
+    if (p.nodes && p.nodes.length > 0) isolateNeighborhood(p.nodes[0]);
+    else resetIsolation();
+  });
+
+  // ---------- rebuild / stats ----------
+  var statsEl = document.getElementById('stats');
+
+  function rebuild(opts){
+    opts = opts || {};
+    var keep = capturePositions();
+    var ns = visibleNodes();
+    nodesDS.clear();
+    edgesDS.clear();
+    nodesDS.add(ns.map(function(n){ return toVisNode(n, keep[n.id]); }));
+    var ids = new Set(ns.map(function(n){ return n.id; }));
+    edgesDS.add(VALID_EDGES.filter(function(e){ return ids.has(e.f) && ids.has(e.t); }).map(toVisEdge));
+    if (opts.fit) network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
+    updateStats(ns);
+  }
+
+  function updateStats(ns){
+    if (ns === undefined) ns = visibleNodes();
+    var files = new Set(ns.map(function(n){ return n.sf; })).size;
+    var hidden = Object.keys(hiddenLayers).length;
+    var html = ns.length.toLocaleString() + ' symbols · ' + nodesDS.length + ' nodes · ' + edgesDS.length.toLocaleString() + ' edges shown · ' + files + ' files';
+    if (hidden) html += ' · ' + hidden + ' layer' + (hidden > 1 ? 's' : '') + ' hidden';
+    if (isolated) html += ' · isolated';
+    statsEl.innerHTML = html + '<br>' +
+      VALID_EDGES.length.toLocaleString() + ' edges total · tests/notebooks excluded<br>' +
+      '<kbd>/</kbd> search · <kbd>Esc</kbd> clear';
+  }
+
+  // ---------- legend ----------
+  var legendEl = document.getElementById('layers-list');
   LAYERS.forEach(function(L){
-    var c=allHidden?LAYERS.length:LAYERS.filter(l=>!hiddenLayers[l.id]).length;
-    var item=document.createElement('div');item.className='layer-item';
-    item.innerHTML='<span class="layer-dot" style="background:'+L.color+'"></span><span class="layer-label">'+L.title+'</span><span class="layer-count">'+c+'</span>';
-    item.addEventListener('click',function(){
-      if(!hiddenLayers[L.id]){hiddenLayers[L.id]=true}else{delete hiddenLayers[L.id]}
-      rebuild();updateLegend();updateStats();
+    var count = NODES.filter(function(n){ return n.ly === L.id; }).length;
+    var item = document.createElement('div');
+    item.className = 'layer-item';
+    item.innerHTML = '<span class="layer-dot" style="background:' + L.color + '"></span>' +
+      '<span class="layer-label">' + L.title + '</span>' +
+      '<span class="layer-count">' + count.toLocaleString() + '</span>';
+    item.title = L.blurb || L.id;
+    item.addEventListener('click', function(){
+      if (hiddenLayers[L.id]) delete hiddenLayers[L.id]; else hiddenLayers[L.id] = true;
+      item.classList.toggle('off', !!hiddenLayers[L.id]);
+      rebuild({});
     });
     legendEl.appendChild(item);
   });
 
-  function rebuild(){
-    var {nodes,counts}=getVisibleNodes();
-    nodesDS.clear();edgesDS.clear();
-    nodes.forEach(function(n){nodesDS.add({...n,PhysicsOptions:true,borderWidth:0,size:Math.max(3,Math.min(12,Math.sqrt(deg[n.id]||0)))})});
-    DATA.edges.forEach(function(e){if(nodes.find(n=>n.id===e.f)&&nodes.find(n=>n.id===e.t))edgesDS.add({id:e.f+'_'+e.t,from:e.f,to:e.t,label:e.r!==undefined&&e.r?'':'',group:e.r||'default',physics:true})});
-  }
-
-  function updateLegend(){LAYERS.forEach(function(L){var c=LAYERS.filter(l=>!hiddenLayers[l.id]).length;var dots=legendEl.querySelectorAll('.layer-dot');dots.forEach(function(d,i){})});}
-  function updateStats(){statsEl.innerHTML=getVisibleNodes().nodes.length+' production symbols · '+DATA.edges.length+' edges · '+Object.keys(hiddenLayers).length+' hidden layers<br>'+document.getElementById('stats').querySelectorAll('br')[0].parentNode.innerHTML;}
-
-  // Search
-  var searchBox=document.getElementById('searchbox');
-  searchBox.addEventListener('input',function(){
-    var q=searchBox.value.toLowerCase().trim();
-    if(!q){network.selectNodes([]);network.setOptions({nodes:{fontSize:10,color:'#b0bcc8'}});return}
-    var matches=nodesDS.get().filter(n=>(n.l||'').toLowerCase().includes(q)||(n.id||'').toLowerCase().includes(q)||(n.sf||'').toLowerCase().includes(q));
-    var ids=matches.map(n=>n.id);
-    network.selectNodes(ids);
-    var neighbors=new Set(ids);
-    DATA.edges.forEach(function(e){if(ids.includes(e.f))neighbors.add(e.t);if(ids.includes(e.t))neighbors.add(e.f)});
-    var keepIds=new Array(neighbors.size);var idx=0;neighbors.forEach(function(id){keepIds[idx++]=id});
-    var allNodesList=nodesDS.get();
-    var allIds=allNodesList.map(function(n){return n.id});
-    allIds.forEach(function(id){
-      var n=allNodesList.find(x=>x.id===id);
-      if(n){n.color=neighbors.has(id)?{backgroundColor:'#34d399',border:'#fff'}:{color:{fill:'#1a1a2e',stroke:'#1a1a2e'},borderColor:'#1a1a2e'}};
-    });
-    nodesDS.update(allNodesList);
+  // ---------- pipeline conveyor strip ----------
+  var strip = document.getElementById('pipeline-strip');
+  var stripSteps = [];
+  PIPELINE.forEach(function(p, i){
+    if (i > 0) {
+      var arrow = document.createElement('span');
+      arrow.className = 'pipe-arrow';
+      arrow.textContent = '→';
+      strip.appendChild(arrow);
+    }
+    var step = document.createElement('span');
+    step.className = 'pipe-step';
+    step.textContent = p.label;
+    var target = nodeById['packages_llm_mailroom_src_graph_build_graph_' + p.symbol] ||
+      NODES.filter(function(n){ return n.id.slice(-('_' + p.symbol).length) === '_' + p.symbol; })[0];
+    if (target) {
+      step.addEventListener('click', function(){
+        resetIsolation(true);
+        if (hiddenLayers[target.ly]) {
+          delete hiddenLayers[target.ly];
+          Array.prototype.forEach.call(legendEl.children, function(el, idx){
+            el.classList.toggle('off', !!hiddenLayers[LAYERS[idx] && LAYERS[idx].id]);
+          });
+        }
+        rebuild({});
+        network.selectNodes([target.id]);
+        network.focus(target.id, { scale: 1.1, animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+        stripSteps.forEach(function(s){ s.classList.remove('active'); });
+        step.classList.add('active');
+      });
+    } else {
+      step.classList.add('missing');
+    }
+    stripSteps.push(step);
+    strip.appendChild(step);
   });
 
-  // Keyboard shortcut
-  window.addEventListener('keydown',function(e){if(e.key==='/'){e.preventDefault();searchBox.focus()}if(e.key==='Escape'){searchBox.value='';searchBox.dispatchEvent(new Event('input'));searchBox.blur()}});
+  // ---------- search ----------
+  var searchBox = document.getElementById('searchbox');
 
-  // Fit view
-  setTimeout(function(){network.fit({animation:{duration:600,easingFunction:'easeInOutQuad'}})},300);
+  function restoreColors(){
+    var upd = nodesDS.get().map(function(n){
+      var orig = nodeById[n.id];
+      return { id: n.id, color: orig ? baseColor(orig) : baseColor(n), font: BASE_FONT };
+    });
+    nodesDS.update(upd);
+    network.unselectAll();
+  }
 
+  function applySearch(q){
+    if (!q) { restoreColors(); return; }
+    var vis = nodesDS.get();
+    var matches = vis.filter(function(n){
+      var orig = nodeById[n.id];
+      return orig && (
+        (orig.l || '').toLowerCase().indexOf(q) !== -1 ||
+        n.id.toLowerCase().indexOf(q) !== -1 ||
+        (orig.sf || '').toLowerCase().indexOf(q) !== -1
+      );
+    });
+    var ids = matches.map(function(n){ return n.id; });
+    network.selectNodes(ids);
+    var keep = new Set(ids);
+    ids.forEach(function(id){ (adj[id] || []).forEach(function(nb){ keep.add(nb); }); });
+    var upd = vis.map(function(n){
+      if (keep.has(n.id)) {
+        return { id: n.id, font: { size: 10, color: '#f1f5f9', face: BASE_FONT.face } };
+      }
+      return { id: n.id, color: { background: '#1c2333', border: '#1c2333', highlight: { background: '#1c2333', border: '#1c2333' }, hover: { background: '#1c2333', border: '#1c2333' } }, font: DIM_FONT };
+    });
+    nodesDS.update(upd);
+  }
+
+  searchBox.addEventListener('input', function(){
+    applySearch(searchBox.value.toLowerCase().trim());
+  });
+
+  // ---------- keyboard ----------
+  window.addEventListener('keydown', function(e){
+    if (e.key === '/' && document.activeElement !== searchBox) {
+      e.preventDefault();
+      searchBox.focus();
+    } else if (e.key === 'Escape') {
+      if (searchBox.value) {
+        searchBox.value = '';
+        applySearch('');
+        searchBox.blur();
+      }
+      stripSteps.forEach(function(s){ s.classList.remove('active'); });
+      resetIsolation();
+    }
+  });
+
+  // ---------- boot ----------
+  updateStats();
+  setTimeout(function(){ network.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } }); }, 300);
+
+  // debug/automation hook
+  window.__grafify = { network: network, nodesDS: nodesDS, edgesDS: edgesDS, isolate: isolateNeighborhood, resetIsolation: resetIsolation, stats: updateStats };
 })();
 </script>
 </body>
