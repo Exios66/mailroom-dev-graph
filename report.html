@@ -3,308 +3,620 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Graph Report — mailroom-dev</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%A6%89%3C/text%3E%3C/svg%3E">
-<script src="https://unpkg.com/pako@2.1.0/dist/pako.min.js"
-        integrity="sha384-Lg1hESD15P3+FyJCjkYTLwRIcBdoSBT213ypP5lVWR+XQf2N1x3KQ2E4ReRBPvoT"
-        crossorigin="anonymous"></script>
+<title>Graph Report -- mailroom-dev</title>
 <style>
-:root{--bg:#0b1220;--panel:#0f172a;--panel2:#111c33;--line:rgba(148,163,184,.15);
---txt:#e2e8f0;--mut:#94a3b8;--dim:#64748b;--acc:#34d399;--acc2:#38bdf8;
---amber:#fbbf24;--rose:#fb7185;--mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
+:root{--bg:#0b1220;--panel:#0f172a;--panel2:#111c33;--line:rgba(148,163,184,.15);--txt:#e2e8f0;--mut:#94a3b8;--dim:#64748b;--acc:#34d399;--acc2:#38bdf8;--amber:#fbbf24;--rose:#fb7185;--mono:ui-monospace,Menlo,Consolas,monospace}
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
-body{background:var(--bg);color:var(--txt);font:16px/1.65 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
-#progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));z-index:99;transition:width .1s}
-header.top{position:sticky;top:0;z-index:50;background:rgba(11,18,32,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.topin{max-width:980px;margin:0 auto;padding:.7rem 1.2rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
-.brand{font-weight:700;font-size:1rem;color:var(--acc);white-space:nowrap}
-nav{display:flex;gap:.2rem;flex-wrap:wrap}
-nav a{color:var(--mut);text-decoration:none;font-size:.83rem;padding:.25rem .55rem;border-radius:6px}
+body{background:var(--bg);color:var(--txt);line-height:1.6;font:16px -apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:50;background:rgba(11,18,32,.92);border-bottom:1px solid var(--line);padding:.5rem 1.2rem}
+.header-inner{max-width:980px;margin:0 auto;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.brand{font-weight:700;font-size:1rem;color:var(--acc)}
+nav{display:flex;gap:2px;flex-wrap:wrap}
+nav a{color:var(--mut);text-decoration:none;font-size:.82rem;padding:.3rem .55rem;border-radius:6px}
 nav a:hover{color:var(--txt);background:var(--panel2)}
-.searchwrap{margin-left:auto;display:flex;align-items:center;gap:.5rem}
-#search{background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--txt);
-padding:.42rem .7rem;font-size:.86rem;width:210px;outline:none;transition:border .15s,width .2s}
-#search:focus{border-color:var(--acc);width:260px}
-main{max-width:980px;margin:0 auto;padding:2rem 1.2rem 5rem}
-section{scroll-margin-top:76px;margin-bottom:3rem}
-.hero{padding:2.2rem 0 1.4rem;border-bottom:1px solid var(--line);margin-bottom:2rem}
-.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);letter-spacing:-.02em}
-.hero h1 em{color:var(--acc);font-style:normal}
-.meta{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.7rem}
-.pill{font-size:.75rem;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:.18rem .7rem;background:var(--panel)}
+main{max-width:980px;margin:0 auto;padding:1.5rem}
+h1{font-size:1.5rem;margin-bottom:.25rem}
+h2{font-size:1.2rem;margin:2rem 0 .75rem}
+.meta{display:flex;gap:.4rem;flex-wrap:wrap;margin:.4rem 0 .8rem}
+.pill{background:var(--panel2);border:1px solid var(--line);border-radius:100px;padding:.2rem .6rem;font-size:.78rem;color:var(--mut)}
 .pill b{color:var(--txt);font-weight:600}
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.8rem;margin-top:1.6rem}
-.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
-.tile-v{font-size:1.9rem;font-weight:800;color:var(--acc);font-family:var(--mono)}
-.tile-l{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);margin-top:.15rem}
-.tile-s{font-size:.72rem;color:var(--dim);margin-top:.1rem}
-h2{font-size:1.15rem;display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
-h2::before{content:"";width:8px;height:22px;border-radius:3px;background:linear-gradient(var(--acc),var(--acc2))}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.3rem 1.4rem}
-.note{color:var(--mut);font-size:.92rem}
-.chips{display:flex;flex-wrap:wrap;gap:.45rem}
-.chip{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:999px;
-padding:.28rem .75rem;font-size:.8rem;font-family:var(--mono);cursor:pointer;transition:all .15s}
-.chip:hover{border-color:var(--acc);color:var(--acc);transform:translateY(-1px)}
-.godrow{display:grid;grid-template-columns:minmax(180px,240px) 1fr;gap:1rem;align-items:center;padding:.42rem 0}
-.godname code{font-size:.88rem;color:var(--acc2)}
-.godbarwrap{position:relative;background:var(--panel2);border-radius:6px;height:22px;overflow:hidden}
-.godbar{height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,rgba(52,211,153,.35),var(--acc));transition:width .9s cubic-bezier(.22,1,.36,1)}
-.godval{position:absolute;right:.6rem;top:50%;transform:translateY(-50%);font-size:.75rem;color:var(--txt);font-family:var(--mono)}
-ul.surplist{list-style:none;display:grid;gap:.7rem}
-.surp{background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:10px;padding:.75rem 1rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
-.edge code{font-size:.86rem}.rel{color:var(--amber);font-family:var(--mono);font-size:.8rem;margin:0 .35rem}
-.badge{font-size:.68rem;font-weight:700;letter-spacing:.06em;border-radius:5px;padding:.1rem .45rem}
-.badge.amber{background:rgba(251,191,36,.15);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
-.badge.green{background:rgba(52,211,153,.13);color:var(--acc);border:1px solid rgba(52,211,153,.3)}
-.paths{flex-basis:100%;font-family:var(--mono);font-size:.74rem;color:var(--dim)}
-.okpill{display:inline-flex;align-items:center;gap:.45rem;color:var(--acc);font-size:.95rem}
-.gridtools{display:flex;align-items:center;gap:.8rem;margin-bottom:1rem;flex-wrap:wrap}
-#count{font-size:.8rem;color:var(--dim);font-family:var(--mono)}
-.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:.9rem}
-.ccard{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem 1.05rem;transition:border-color .15s,transform .15s}
-.ccard:hover{border-color:rgba(52,211,153,.45);transform:translateY(-2px)}
-.ccard.hide{display:none}
-.chead{display:flex;align-items:baseline;gap:.55rem;flex-wrap:wrap}
-.cid{font-family:var(--mono);font-size:.72rem;color:var(--dim)}
-.chead h4{font-size:.95rem;color:var(--acc2);word-break:break-all}
-.ccount{margin-left:auto;font-size:.72rem;color:var(--mut);font-family:var(--mono)}
-.ccount em{color:var(--dim);font-style:normal}
-.cohrow{display:flex;align-items:center;gap:.55rem;margin-top:.55rem}
-.cohlabel{font-size:.66rem;text-transform:uppercase;letter-spacing:.09em;color:var(--dim)}
-.cohmeter{flex:1;height:5px;border-radius:3px;background:var(--panel2);overflow:hidden}
-.cohfill{height:100%;background:linear-gradient(90deg,var(--acc2),var(--acc));border-radius:3px}
-.cohval{font-size:.72rem;color:var(--mut);font-family:var(--mono)}
-.cprev{margin-top:.6rem;font-family:var(--mono);font-size:.73rem;line-height:1.5;color:var(--mut);word-break:break-word}
-.noresults{display:none;color:var(--dim);padding:2rem;text-align:center;font-size:.9rem}
-.qa{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:.6rem;overflow:hidden}
-.qa summary{cursor:pointer;padding:.85rem 1.1rem;font-size:.93rem;list-style:none;display:flex;gap:.6rem;align-items:flex-start}
-.qa summary::before{content:"+";color:var(--acc);font-weight:800;font-family:var(--mono);flex-shrink:0}
-.qa[open] summary::before{content:"\u2212"}
-.qa summary:hover{background:var(--panel2)}
-.qa p{padding:0 1.1rem 1rem 2.15rem;color:var(--mut);font-size:.87rem}
-.gapcard{background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.25);border-radius:10px;padding:.9rem 1.1rem;margin-bottom:.7rem;font-size:.92rem}
-.gapsub{color:var(--dim);font-size:.82rem}
-footer{border-top:1px solid var(--line);margin-top:4rem;padding-top:1.4rem;color:var(--dim);font-size:.8rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
-footer a{color:var(--acc2)}
-#totop{position:fixed;right:1.2rem;bottom:1.2rem;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);
-background:var(--panel);color:var(--acc);font-size:1.1rem;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s;z-index:60}
-#totop.show{opacity:1;pointer-events:auto}
-code{font-family:var(--mono);font-size:.85em;background:var(--panel2);padding:.08em .4em;border-radius:5px}
-.graphbtn{display:inline-flex;align-items:center;gap:.5rem;background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(56,189,248,.15));
-border:1px solid rgba(52,211,153,.4);color:var(--acc);text-decoration:none;font-size:.9rem;font-weight:600;
-border-radius:10px;padding:.6rem 1.1rem;transition:all .15s}
-.graphbtn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(52,211,153,.15)}
+.green{border-color:var(--acc);color:var(--acc)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.6rem;margin:.8rem 0}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem;text-align:center}
+.tile-v{font-size:1.8rem;font-weight:700;color:var(--acc)}
+.tile-l{font-size:.8rem;color:var(--mut)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.8rem;margin:.5rem 0 1rem}
+.godrow{display:flex;align-items:center;gap:.6rem;padding:.3rem 0;border-bottom:1px solid var(--line)}
+.godrow:last-child{border:0}
+.godname{min-width:180px;font-family:var(--mono);font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.godbarwrap{flex:1;display:flex;align-items:center;gap:.4rem}
+.godbar{height:22px;border-radius:6px;background:linear-gradient(90deg,var(--acc),var(--acc2));min-width:4px}
+.godval{font-family:var(--mono);font-size:.82rem;color:var(--dim);min-width:2.5rem;text-align:right}
+.graphbtn{display:inline-block;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:.4rem .85rem;font-size:.85rem;text-decoration:none;color:var(--txt)}
+.graphbtn:hover{border-color:var(--acc)}
+.comm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.5rem}
+.comm-card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.7rem .9rem}
+.comm-card h3{font-size:.9rem;margin-bottom:.3rem}
+.comm-size{font-size:.75rem;color:var(--dim);margin-bottom:.4rem}
+.comm-member{font-family:var(--mono);font-size:.7rem;background:var(--panel2);padding:.05rem .35rem;border-radius:4px;color:var(--mut)}
+#search{background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:.4rem .7rem;font-size:.85rem;width:180px;outline:none}
+#search:focus{border-color:var(--acc)}
+.emptynote{color:var(--dim);font-style:italic}
+.lonely-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.3rem}
+.lonely-item{font-family:var(--mono);font-size:.75rem;background:var(--panel2);padding:.15rem .45rem;border-radius:4px;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:600px){
+.tiles{grid-template-columns:repeat(2,1fr)}
+.godname{min-width:120px;font-size:.72rem}
+.comm-grid{grid-template-columns:1fr}
+#search{width:130px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
 </style>
+</head>
 <body>
-<div id="progress"></div>
-<header class="top"><div class="topin">
-<span class="brand">&#x1F989; mailroom-dev &middot; graph report</span>
+<header><div class="header-inner">
+<span class="brand">mailroom-dev &middot; graph report</span>
 <nav>
 <a href="./">map</a><a href="./tree.html">tree</a>
-<a href="#stats">stats</a><a href="#hubs">hubs</a><a href="#gods">god nodes</a>
-<a href="#conns">connections</a><a href="#communities">communities</a>
-<a href="#gaps">gaps</a><a href="#questions">questions</a>
+<a href="#stats">stats</a><a href="#gods">god nodes</a>
+<a href="#surprises">surprises</a>
+<a href="#files">files</a><a href="#communities">communities</a><a href="#gaps">gaps</a>
 </nav>
-<div class="searchwrap"><input id="search" type="search" placeholder="filter communities&hellip; ( / )" aria-label="Filter communities"></div>
+<input id="search" type="search" placeholder="filter communities...">
 </div></header>
 <main>
-<section class="hero" id="stats">
+<section id="stats">
 <h1>Knowledge Graph Report &mdash; <em>mailroom-dev</em></h1>
 <div class="meta">
 <span class="pill">built <b>2026-08-30</b></span>
 <span class="pill">commit <b>998922f0</b></span>
-<span class="pill green badge">code-only AST</span>
-<span class="pill">production <b>code</b> &middot; tests/notebooks/.opencode excluded</span>
-<span class="pill">graphify <b>0.9.48</b></span>
+<span class="pill green">code-only AST</span>
 </div>
 <div class="tiles">
-<div class="tile"><div class="tile-v"><span class="num" data-count="4870">0</span></div><div class="tile-l">nodes</div></div>
-<div class="tile"><div class="tile-v"><span class="num" data-count="16161">0</span></div><div class="tile-l">edges</div></div>
-<div class="tile"><div class="tile-v"><span class="num" data-count="325">0</span></div><div class="tile-l">communities</div><div class="tile-s">150 shown</div></div>
-<div class="tile"><div class="tile-v"><span class="num" data-count="462">0</span></div><div class="tile-l">source files</div><div class="tile-s">production Python only</div></div>
+<div class="tile"><div class="tile-v">4870</div><div class="tile-l">code nodes</div></div>
+<div class="tile"><div class="tile-v">16161</div><div class="tile-l">edges</div></div>
+<div class="tile"><div class="tile-v">310</div><div class="tile-l">communities</div></div>
+<div class="tile"><div class="tile-v">463</div><div class="tile-l">source files</div></div>
+<div class="tile"><div class="tile-v">13</div><div class="tile-l">rel types</div></div>
+<div class="tile"><div class="tile-v">3793</div><div class="tile-l">callables</div></div>
 </div>
-<p style="margin-top:1.4rem"><a class="graphbtn" href="./">&#x2197; Open the architecture map</a>
-<a class="graphbtn" href="./tree.html" style="margin-left:.5rem">&#x1F333; Module tree</a></p>
+<p><a class="graphbtn" href="./">Open the architecture map</a>
+<a class="graphbtn" href="./tree.html" style="margin-left:.5rem">Module tree</a></p>
 </section>
-
-<section id="fresh">
-<h2>Overview</h2>
-<div class="panel note">
-<p>Knowledge graph of the <a href="https://github.com/Exios66/mailroom-dev"><code>mailroom-dev</code></a> monorepo &mdash; the LLM-Mailroom constellation. Rebuilt <b>2026-08-30</b> from commit <a href="https://github.com/Exios66/mailroom-dev/commit/998922f0dd12107949a20a08489b88c3771e9030"><code>998922f0</code></a>.</p>
-<p style="margin-top:.7rem">This build indexes <b>production code only</b> (462 Python files) across all 9 workspace packages. The graph follows the real architecture: the core Mailroom Pipeline, Entity Extraction agents, Agent Mailroom queue-based processing, the Mailroom UI telemetry dashboard, Dojo Scoring engine, Local Sandbox, Claims EDA, and Enron Eval Environment.</p>
-<p style="margin-top:.7rem">Navigate the <a href="./">architecture map</a> as <b>layers &rarr; modules &rarr; symbols</b>.
-The 13-node conveyor strip jumps to pipeline stages. Double-click a symbol to isolate its neighborhood.</p>
+<section id="conns"><h2>Connection types</h2>
+<div class="panel">
+<div class="godrow"><div class="godname"><code>calls</code></div><div class="godbarwrap"><div class="godbar" style="width:100.0%"></div><span class="godval">5805 (35.9%)</span></div></div>
+<div class="godrow"><div class="godname"><code>contains</code></div><div class="godbarwrap"><div class="godbar" style="width:58.7%"></div><span class="godval">3407 (21.1%)</span></div></div>
+<div class="godrow"><div class="godname"><code>imports</code></div><div class="godbarwrap"><div class="godbar" style="width:33.2%"></div><span class="godval">1925 (11.9%)</span></div></div>
+<div class="godrow"><div class="godname"><code>rationale_for</code></div><div class="godbarwrap"><div class="godbar" style="width:30.7%"></div><span class="godval">1780 (11.0%)</span></div></div>
+<div class="godrow"><div class="godname"><code>references</code></div><div class="godbarwrap"><div class="godbar" style="width:23.7%"></div><span class="godval">1375 (8.5%)</span></div></div>
+<div class="godrow"><div class="godname"><code>imports_from</code></div><div class="godbarwrap"><div class="godbar" style="width:14.0%"></div><span class="godval">810 (5.0%)</span></div></div>
+<div class="godrow"><div class="godname"><code>method</code></div><div class="godbarwrap"><div class="godbar" style="width:8.8%"></div><span class="godval">509 (3.1%)</span></div></div>
+<div class="godrow"><div class="godname"><code>uses</code></div><div class="godbarwrap"><div class="godbar" style="width:4.0%"></div><span class="godval">211 (1.3%)</span></div></div>
+<div class="godrow"><div class="godname"><code>indirect_call</code></div><div class="godbarwrap"><div class="godbar" style="width:4.0%"></div><span class="godval">176 (1.1%)</span></div></div>
+<div class="godrow"><div class="godname"><code>inherits</code></div><div class="godbarwrap"><div class="godbar" style="width:4.0%"></div><span class="godval">104 (0.6%)</span></div></div>
+<div class="godrow"><div class="godname"><code>re_exports</code></div><div class="godbarwrap"><div class="godbar" style="width:4.0%"></div><span class="godval">50 (0.3%)</span></div></div>
+<div class="godrow"><div class="godname"><code>extends</code></div><div class="godbarwrap"><div class="godbar" style="width:4.0%"></div><span class="godval">5 (0.0%)</span></div></div>
+<div class="godrow"><div class="godname"><code>depends_on</code></div><div class="godbarwrap"><div class="godbar" style="width:4.0%"></div><span class="godval">4 (0.0%)</span></div></div>
+</div></section>
+<section id="gods"><h2>God Nodes <span style="font-weight:400;color:var(--dim);font-size:.9rem">most connected callable</span></h2>
+<div class="panel">
+<div class="godrow"><div class="godname"><code>require_env()</code></div><div class="godbarwrap"><div class="godbar" style="width:100.0%"></div><span class="godval">50</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/env_utils.py</span></div>
+<div class="godrow"><div class="godname"><code>load_braintrust_config()</code></div><div class="godbarwrap"><div class="godbar" style="width:90.0%"></div><span class="godval">45</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/braintrust_config.py</span></div>
+<div class="godrow"><div class="godname"><code>interpret_trace()</code></div><div class="godbarwrap"><div class="godbar" style="width:86.0%"></div><span class="godval">43</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">mailroom_ui/trace_interpreter.py</span></div>
+<div class="godrow"><div class="godname"><code>create_app()</code></div><div class="godbarwrap"><div class="godbar" style="width:86.0%"></div><span class="godval">43</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">server/main.py</span></div>
+<div class="godrow"><div class="godname"><code>LangfuseSource</code></div><div class="godbarwrap"><div class="godbar" style="width:82.0%"></div><span class="godval">41</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">mailroom_ui/langfuse_source.py</span></div>
+<div class="godrow"><div class="godname"><code>load_config()</code></div><div class="godbarwrap"><div class="godbar" style="width:82.0%"></div><span class="godval">41</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/pipeline/config.py</span></div>
+<div class="godrow"><div class="godname"><code>PipelineRun</code></div><div class="godbarwrap"><div class="godbar" style="width:78.0%"></div><span class="godval">39</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">mailroom_ui/models.py</span></div>
+<div class="godrow"><div class="godname"><code>get_prompt()</code></div><div class="godbarwrap"><div class="godbar" style="width:78.0%"></div><span class="godval">39</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/prompts.py</span></div>
+<div class="godrow"><div class="godname"><code>default_jsonl_path()</code></div><div class="godbarwrap"><div class="godbar" style="width:78.0%"></div><span class="godval">39</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/experiment_log.py</span></div>
+<div class="godrow"><div class="godname"><code>SorterAgent</code></div><div class="godbarwrap"><div class="godbar" style="width:76.0%"></div><span class="godval">38</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">agents/sorter_agent.py</span></div>
+<div class="godrow"><div class="godname"><code>run_document()</code></div><div class="godbarwrap"><div class="godbar" style="width:74.0%"></div><span class="godval">37</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/agent_mailroom/pipeline/runner.py</span></div>
+<div class="godrow"><div class="godname"><code>PipelineStage</code></div><div class="godbarwrap"><div class="godbar" style="width:72.0%"></div><span class="godval">36</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/agent_mailroom/schemas/manifest.py</span></div>
+<div class="godrow"><div class="godname"><code>main_with_args()</code></div><div class="godbarwrap"><div class="godbar" style="width:72.0%"></div><span class="godval">36</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">scripts/eval/run_correspondence_eval.py</span></div>
+<div class="godrow"><div class="godname"><code>BaseAgent</code></div><div class="godbarwrap"><div class="godbar" style="width:70.0%"></div><span class="godval">35</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/agents/base.py</span></div>
+<div class="godrow"><div class="godname"><code>_auth()</code></div><div class="godbarwrap"><div class="godbar" style="width:70.0%"></div><span class="godval">35</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/agent_mailroom/api/routes.py</span></div>
+<div class="godrow"><div class="godname"><code>dataset_fingerprint()</code></div><div class="godbarwrap"><div class="godbar" style="width:70.0%"></div><span class="godval">35</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/evaluation.py</span></div>
+<div class="godrow"><div class="godname"><code>ensure_schema()</code></div><div class="godbarwrap"><div class="godbar" style="width:70.0%"></div><span class="godval">35</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/storage/db.py</span></div>
+<div class="godrow"><div class="godname"><code>RunState</code></div><div class="godbarwrap"><div class="godbar" style="width:68.0%"></div><span class="godval">34</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/agent_mailroom/pipeline/state.py</span></div>
+<div class="godrow"><div class="godname"><code>connect()</code></div><div class="godbarwrap"><div class="godbar" style="width:68.0%"></div><span class="godval">34</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/agent_mailroom/storage/db.py</span></div>
+<div class="godrow"><div class="godname"><code>main_with_args()</code></div><div class="godbarwrap"><div class="godbar" style="width:66.0%"></div><span class="godval">33</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">scripts/eval/run_classification_eval.py</span></div>
+</div></section>
+<section id="surprises"><h2>Surprises <span style="font-weight:400;color:var(--dim);font-size:.9rem">non-callable, highly connected</span></h2>
+<div class="panel">
+<div class="godrow"><div class="godname"><code>build_graph.py</code></div><div class="godbarwrap"><div class="godbar" style="width:100.0%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">173</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/graph/build_graph.py</span></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/__init__.py</code></div><div class="godbarwrap"><div class="godbar" style="width:89.6%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">155</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">llm_dojo_scoring/__init__.py</span></div>
+<div class="godrow"><div class="godname"><code>routes.py</code></div><div class="godbarwrap"><div class="godbar" style="width:79.2%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">137</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/agent_mailroom/api/routes.py</span></div>
+<div class="godrow"><div class="godname"><code>api/main.py</code></div><div class="godbarwrap"><div class="godbar" style="width:63.0%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">109</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/api/main.py</span></div>
+<div class="godrow"><div class="godname"><code>run_hf_pilot.py</code></div><div class="godbarwrap"><div class="godbar" style="width:52.6%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">91</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/scripts/run_hf_pilot.py</span></div>
+<div class="godrow"><div class="godname"><code>server/main.py</code></div><div class="godbarwrap"><div class="godbar" style="width:40.5%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">70</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">server/main.py</span></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/field_scoring.py</code></div><div class="godbarwrap"><div class="godbar" style="width:38.2%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">66</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">llm_dojo_scoring/field_scoring.py</span></div>
+<div class="godrow"><div class="godname"><code>run_correspondence_eval.py</code></div><div class="godbarwrap"><div class="godbar" style="width:31.8%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">55</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">scripts/eval/run_correspondence_eval.py</span></div>
+<div class="godrow"><div class="godname"><code>mailroom_sandbox/cli.py</code></div><div class="godbarwrap"><div class="godbar" style="width:31.2%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">54</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/mailroom_sandbox/cli.py</span></div>
+<div class="godrow"><div class="godname"><code>src/pipeline/bins.py</code></div><div class="godbarwrap"><div class="godbar" style="width:30.6%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">53</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/pipeline/bins.py</span></div>
+<div class="godrow"><div class="godname"><code>run_classification_eval.py</code></div><div class="godbarwrap"><div class="godbar" style="width:30.6%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">53</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">scripts/eval/run_classification_eval.py</span></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/tasks.py</code></div><div class="godbarwrap"><div class="godbar" style="width:30.1%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">52</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">llm_dojo_scoring/tasks.py</span></div>
+<div class="godrow"><div class="godname"><code>trace_interpreter.py</code></div><div class="godbarwrap"><div class="godbar" style="width:28.9%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">50</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">mailroom_ui/trace_interpreter.py</span></div>
+<div class="godrow"><div class="godname"><code>pipeline/runner.py</code></div><div class="godbarwrap"><div class="godbar" style="width:28.3%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">49</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/agent_mailroom/pipeline/runner.py</span></div>
+<div class="godrow"><div class="godname"><code>run_pilot.py</code></div><div class="godbarwrap"><div class="godbar" style="width:28.3%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">49</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/scripts/run_pilot.py</span></div>
+<div class="godrow"><div class="godname"><code>run_extraction_eval.py</code></div><div class="godbarwrap"><div class="godbar" style="width:27.2%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">47</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">scripts/eval/run_extraction_eval.py</span></div>
+<div class="godrow"><div class="godname"><code>serving.py</code></div><div class="godbarwrap"><div class="godbar" style="width:26.6%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">46</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">llm_dojo_scoring/serving.py</span></div>
+<div class="godrow"><div class="godname"><code>logging.py</code></div><div class="godbarwrap"><div class="godbar" style="width:26.6%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">46</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/pipeline/logging.py</span></div>
+<div class="godrow"><div class="godname"><code>agents.py</code></div><div class="godbarwrap"><div class="godbar" style="width:26.6%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">46</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/mailroom_sandbox/eval/agents.py</span></div>
+<div class="godrow"><div class="godname"><code>src/env_utils.py</code></div><div class="godbarwrap"><div class="godbar" style="width:25.4%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div><span class="godval">44</span></div><span style="font-size:.72rem;color:var(--dim);font-family:var(--mono)">src/env_utils.py</span></div>
+</div></section>
+<section id="files"><h2>Top files <span style="font-weight:400;color:var(--dim);font-size:.9rem">by node count</span></h2>
+<div class="panel">
+<div class="godrow"><div class="godname"><code></code></div><div class="godbarwrap"><div class="godbar" style="width:100.0%"></div><span class="godval">434</span></div></div>
+<div class="godrow"><div class="godname"><code>office/tiles/manifest.json</code></div><div class="godbarwrap"><div class="godbar" style="width:27.0%"></div><span class="godval">117</span></div></div>
+<div class="godrow"><div class="godname"><code>src/graph/build_graph.py</code></div><div class="godbarwrap"><div class="godbar" style="width:16.8%"></div><span class="godval">73</span></div></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/field_scoring.py</code></div><div class="godbarwrap"><div class="godbar" style="width:14.7%"></div><span class="godval">64</span></div></div>
+<div class="godrow"><div class="godname"><code>src/agent_mailroom/api/routes.py</code></div><div class="godbarwrap"><div class="godbar" style="width:12.0%"></div><span class="godval">52</span></div></div>
+<div class="godrow"><div class="godname"><code>office/js/floor.js</code></div><div class="godbarwrap"><div class="godbar" style="width:11.5%"></div><span class="godval">50</span></div></div>
+<div class="godrow"><div class="godname"><code>src/pipeline/bins.py</code></div><div class="godbarwrap"><div class="godbar" style="width:10.4%"></div><span class="godval">45</span></div></div>
+<div class="godrow"><div class="godname"><code>src/scripts/run_hf_pilot.py</code></div><div class="godbarwrap"><div class="godbar" style="width:9.9%"></div><span class="godval">43</span></div></div>
+<div class="godrow"><div class="godname"><code>office/js/app.js</code></div><div class="godbarwrap"><div class="godbar" style="width:9.7%"></div><span class="godval">42</span></div></div>
+<div class="godrow"><div class="godname"><code>scripts/reporting/export_slides_deck.py</code></div><div class="godbarwrap"><div class="godbar" style="width:9.4%"></div><span class="godval">41</span></div></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/serving.py</code></div><div class="godbarwrap"><div class="godbar" style="width:8.5%"></div><span class="godval">37</span></div></div>
+<div class="godrow"><div class="godname"><code>scripts/reporting/export_full_results_deck.py</code></div><div class="godbarwrap"><div class="godbar" style="width:8.5%"></div><span class="godval">37</span></div></div>
+<div class="godrow"><div class="godname"><code>agents/specialist_agents.py</code></div><div class="godbarwrap"><div class="godbar" style="width:8.3%"></div><span class="godval">36</span></div></div>
+<div class="godrow"><div class="godname"><code>scripts/eval/run_annotation_queue.py</code></div><div class="godbarwrap"><div class="godbar" style="width:7.8%"></div><span class="godval">34</span></div></div>
+<div class="godrow"><div class="godname"><code>src/api/main.py</code></div><div class="godbarwrap"><div class="godbar" style="width:7.6%"></div><span class="godval">33</span></div></div>
+<div class="godrow"><div class="godname"><code>src/mailroom_sandbox/eval/agents.py</code></div><div class="godbarwrap"><div class="godbar" style="width:7.4%"></div><span class="godval">32</span></div></div>
+<div class="godrow"><div class="godname"><code>scripts/eda/explore_cms.py</code></div><div class="godbarwrap"><div class="godbar" style="width:7.4%"></div><span class="godval">32</span></div></div>
+<div class="godrow"><div class="godname"><code>mailroom_ui/langfuse_source.py</code></div><div class="godbarwrap"><div class="godbar" style="width:7.1%"></div><span class="godval">31</span></div></div>
+<div class="godrow"><div class="godname"><code>mailroom_ui/trace_interpreter.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.9%"></div><span class="godval">30</span></div></div>
+<div class="godrow"><div class="godname"><code>src/observability/langfuse_setup.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.7%"></div><span class="godval">29</span></div></div>
+<div class="godrow"><div class="godname"><code>src/pipeline/watcher.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.5%"></div><span class="godval">28</span></div></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/emitter.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.5%"></div><span class="godval">28</span></div></div>
+<div class="godrow"><div class="godname"><code>src/mailroom_sandbox/cli.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.5%"></div><span class="godval">28</span></div></div>
+<div class="godrow"><div class="godname"><code>mailroom_ui/phoenix_source.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.2%"></div><span class="godval">27</span></div></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/suites.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.0%"></div><span class="godval">26</span></div></div>
+<div class="godrow"><div class="godname"><code>src/langchain_agents/specialist_agents.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.0%"></div><span class="godval">26</span></div></div>
+<div class="godrow"><div class="godname"><code>scripts/seed_demo.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.0%"></div><span class="godval">26</span></div></div>
+<div class="godrow"><div class="godname"><code>src/agent_mailroom/pipeline/bins.py</code></div><div class="godbarwrap"><div class="godbar" style="width:6.0%"></div><span class="godval">26</span></div></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/tasks.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.8%"></div><span class="godval">25</span></div></div>
+<div class="godrow"><div class="godname"><code>scripts/eda/explore_pipeline_sources.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.8%"></div><span class="godval">25</span></div></div>
+<div class="godrow"><div class="godname"><code>src/phoenix_tracing.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.5%"></div><span class="godval">24</span></div></div>
+<div class="godrow"><div class="godname"><code>src/scripts/sync_hf_ground_truth.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.5%"></div><span class="godval">24</span></div></div>
+<div class="godrow"><div class="godname"><code>src/scripts/run_pilot.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.5%"></div><span class="godval">24</span></div></div>
+<div class="godrow"><div class="godname"><code>office/js/layout.js</code></div><div class="godbarwrap"><div class="godbar" style="width:5.5%"></div><span class="godval">24</span></div></div>
+<div class="godrow"><div class="godname"><code>mailroom_ui/review_actions.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.3%"></div><span class="godval">23</span></div></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/langfuse_sync.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.1%"></div><span class="godval">22</span></div></div>
+<div class="godrow"><div class="godname"><code>src/scripts/validate_pipeline.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.1%"></div><span class="godval">22</span></div></div>
+<div class="godrow"><div class="godname"><code>src/langchain_agents/base_agent.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.1%"></div><span class="godval">22</span></div></div>
+<div class="godrow"><div class="godname"><code>tui/mailroom_console.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.1%"></div><span class="godval">22</span></div></div>
+<div class="godrow"><div class="godname"><code>llm_dojo_scoring/content_scoring.py</code></div><div class="godbarwrap"><div class="godbar" style="width:5.1%"></div><span class="godval">22</span></div></div>
+</div></section>
+<section id="communities"><h2>Communities <span style="font-weight:400;color:var(--dim);font-size:.9rem">top 30 of 310</span></h2>
+<div class="comm-grid" id="commgrid">
+<div class="comm-card" data-comm="4"><h3>Community 4</h3><div class="comm-size">84 nodes</div><div class="comm-members">
+<span class="comm-member">build_deck()</span>
+<span class="comm-member">_cost()</span>
+<span class="comm-member">_date()</span>
+<span class="comm-member">_extraction_records()</span>
+<span class="comm-member">_extraction_row()</span>
+<span class="comm-member">_get()</span>
+<span class="comm-member">_lb_group()</span>
+<span class="comm-member">_lb_records()</span>
+<span class="comm-member">_lb_row()</span>
+<span class="comm-member">load_contract_fields()</span>
+<span class="comm-member" style="color:var(--dim)">+74 more</span>
+</div></div>
+<div class="comm-card" data-comm="0"><h3>Community 0</h3><div class="comm-size">81 nodes</div><div class="comm-members">
+<span class="comm-member">DocumentState</span>
+<span class="comm-member">DocumentManifest</span>
+<span class="comm-member">save_manifest()</span>
+<span class="comm-member">apply_intake()</span>
+<span class="comm-member">arbiter_node()</span>
+<span class="comm-member">archive_node()</span>
+<span class="comm-member">boss_escalation_node()</span>
+<span class="comm-member">_build_checkpointer()</span>
+<span class="comm-member">build_graph()</span>
+<span class="comm-member">_build_handoff_context()</span>
+<span class="comm-member" style="color:var(--dim)">+71 more</span>
+</div></div>
+<div class="comm-card" data-comm="1"><h3>Community 1</h3><div class="comm-size">79 nodes</div><div class="comm-members">
+<span class="comm-member">active_api_tokens()</span>
+<span class="comm-member">analyze_audit_database()</span>
+<span class="comm-member">assert_bind_allowed()</span>
+<span class="comm-member">_check_database()</span>
+<span class="comm-member">_csv_tokens()</span>
+<span class="comm-member">_document_payload_from_manifest()</span>
+<span class="comm-member">document_source()</span>
+<span class="comm-member">_embed_watcher_running()</span>
+<span class="comm-member">get_document_status()</span>
+<span class="comm-member">get_matter()</span>
+<span class="comm-member" style="color:var(--dim)">+69 more</span>
+</div></div>
+<div class="comm-card" data-comm="3"><h3>Community 3</h3><div class="comm-size">72 nodes</div><div class="comm-members">
+<span class="comm-member">FakeLangChainLLM</span>
+<span class="comm-member">_FakeStructuredRunner</span>
+<span class="comm-member">InboxHandler</span>
+<span class="comm-member">Watcher</span>
+<span class="comm-member">_WatcherLock</span>
+<span class="comm-member">WatcherLockHeld</span>
+<span class="comm-member">_Choices</span>
+<span class="comm-member">_EvalLangChainLLM</span>
+<span class="comm-member">_HintedEvalLangChainLLM</span>
+<span class="comm-member">_MockClient</span>
+<span class="comm-member" style="color:var(--dim)">+62 more</span>
+</div></div>
+<div class="comm-card" data-comm="10"><h3>Community 10</h3><div class="comm-size">71 nodes</div><div class="comm-members">
+<span class="comm-member">RunState</span>
+<span class="comm-member">PipelineStage</span>
+<span class="comm-member">run_agent()</span>
+<span class="comm-member">resolve()</span>
+<span class="comm-member">_spawn()</span>
+<span class="comm-member">confidence()</span>
+<span class="comm-member">extractable_types()</span>
+<span class="comm-member">specialist_for()</span>
+<span class="comm-member">move_file()</span>
+<span class="comm-member">conflict_detail()</span>
+<span class="comm-member" style="color:var(--dim)">+61 more</span>
+</div></div>
+<div class="comm-card" data-comm="11"><h3>Community 11</h3><div class="comm-size">70 nodes</div><div class="comm-members">
+<span class="comm-member">DemoBody</span>
+<span class="comm-member">HubPullBody</span>
+<span class="comm-member">ResolveBody</span>
+<span class="comm-member">TopicBody</span>
+<span class="comm-member">TopicDispatchBody</span>
+<span class="comm-member">_bin_name()</span>
+<span class="comm-member">document_view()</span>
+<span class="comm-member">floor_bins()</span>
+<span class="comm-member">floor_run()</span>
+<span class="comm-member">read_source_text()</span>
+<span class="comm-member" style="color:var(--dim)">+60 more</span>
+</div></div>
+<div class="comm-card" data-comm="2"><h3>Community 2</h3><div class="comm-size">69 nodes</div><div class="comm-members">
+<span class="comm-member">SorterAgent</span>
+<span class="comm-member">ContractsSpecialist</span>
+<span class="comm-member">ManifestStore</span>
+<span class="comm-member">tokens_summary()</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">print_binary_results()</span>
+<span class="comm-member">log_experiment_to_repo()</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">main_with_args()</span>
+<span class="comm-member">load_dataset_for_mode()</span>
+<span class="comm-member" style="color:var(--dim)">+59 more</span>
+</div></div>
+<div class="comm-card" data-comm="7"><h3>Community 7</h3><div class="comm-size">67 nodes</div><div class="comm-members">
+<span class="comm-member">AuditLogRecord</span>
+<span class="comm-member">DocumentRecord</span>
+<span class="comm-member">MatterRecord</span>
+<span class="comm-member">Base</span>
+<span class="comm-member">_write_review_audit_entry()</span>
+<span class="comm-member">_all_chains()</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">analyze_audit_db()</span>
+<span class="comm-member">get_audit_chain()</span>
+<span class="comm-member">get_latest_audit_hash()</span>
+<span class="comm-member" style="color:var(--dim)">+57 more</span>
+</div></div>
+<div class="comm-card" data-comm="6"><h3>Community 6</h3><div class="comm-size">56 nodes</div><div class="comm-members">
+<span class="comm-member">classes_match()</span>
+<span class="comm-member">normalize_class()</span>
+<span class="comm-member">score_exact_classification()</span>
+<span class="comm-member">default_environment()</span>
+<span class="comm-member">active_corpus()</span>
+<span class="comm-member">adapt_hub_row()</span>
+<span class="comm-member">example_for_class()</span>
+<span class="comm-member">example_rows()</span>
+<span class="comm-member">examples_by_class()</span>
+<span class="comm-member">hub_sample()</span>
+<span class="comm-member" style="color:var(--dim)">+46 more</span>
+</div></div>
+<div class="comm-card" data-comm="20"><h3>Community 20</h3><div class="comm-size">54 nodes</div><div class="comm-members">
+<span class="comm-member">DocumentManifest</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">_next_seq()</span>
+<span class="comm-member">record_span()</span>
+<span class="comm-member">span()</span>
+<span class="comm-member">_utcnow()</span>
+<span class="comm-member">boss_sweep()</span>
+<span class="comm-member">recover_stuck()</span>
+<span class="comm-member">_utc_now()</span>
+<span class="comm-member">compute_entry_hash()</span>
+<span class="comm-member" style="color:var(--dim)">+44 more</span>
+</div></div>
+<div class="comm-card" data-comm="5"><h3>Community 5</h3><div class="comm-size">54 nodes</div><div class="comm-members">
+<span class="comm-member">_EmbeddingMatcher</span>
+<span class="comm-member">EntityListScore</span>
+<span class="comm-member">_as_list()</span>
+<span class="comm-member">audit_list_field()</span>
+<span class="comm-member">audit_scalar_field()</span>
+<span class="comm-member">_containment_tokens()</span>
+<span class="comm-member">_date_expected_is_null()</span>
+<span class="comm-member">_date_grounded_in_doc()</span>
+<span class="comm-member">_date_phrase_contained()</span>
+<span class="comm-member">disaggregate_clause_spans()</span>
+<span class="comm-member" style="color:var(--dim)">+44 more</span>
+</div></div>
+<div class="comm-card" data-comm="9"><h3>Community 9</h3><div class="comm-size">51 nodes</div><div class="comm-members">
+<span class="comm-member">failure()</span>
+<span class="comm-member">normalize_label()</span>
+<span class="comm-member">_experiment_id()</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">print_comparison()</span>
+<span class="comm-member">_prompt_version()</span>
+<span class="comm-member">_summarize()</span>
+<span class="comm-member">_task_results()</span>
+<span class="comm-member">binary_dataset()</span>
+<span class="comm-member">to_binary()</span>
+<span class="comm-member" style="color:var(--dim)">+41 more</span>
+</div></div>
+<div class="comm-card" data-comm="35"><h3>Community 35</h3><div class="comm-size">50 nodes</div><div class="comm-members">
+<span class="comm-member">Avatar</span>
+<span class="comm-member">OfficeFloor</span>
+<span class="comm-member">.assignWork()</span>
+<span class="comm-member">.clearWork()</span>
+<span class="comm-member">.constructor()</span>
+<span class="comm-member">.step()</span>
+<span class="comm-member">.tile()</span>
+<span class="comm-member">.walkTo()</span>
+<span class="comm-member">deskNearBin()</span>
+<span class="comm-member">drawAvatar()</span>
+<span class="comm-member" style="color:var(--dim)">+40 more</span>
+</div></div>
+<div class="comm-card" data-comm="22"><h3>Community 22</h3><div class="comm-size">48 nodes</div><div class="comm-members">
+<span class="comm-member">_NoopSpan</span>
+<span class="comm-member">_cmd_eval()</span>
+<span class="comm-member">dataset_fingerprint()</span>
+<span class="comm-member">parse_expected_fields()</span>
+<span class="comm-member">observation_meta()</span>
+<span class="comm-member">spec_for()</span>
+<span class="comm-member">append()</span>
+<span class="comm-member">new_record()</span>
+<span class="comm-member">_classify_mock()</span>
+<span class="comm-member">_expect_from_row()</span>
+<span class="comm-member" style="color:var(--dim)">+38 more</span>
+</div></div>
+<div class="comm-card" data-comm="8"><h3>Community 8</h3><div class="comm-size">48 nodes</div><div class="comm-members">
+<span class="comm-member">EvalResultShim</span>
+<span class="comm-member">EvalRunShim</span>
+<span class="comm-member">EvalResultShim</span>
+<span class="comm-member">EvalRunShim</span>
+<span class="comm-member">clear_settings_cache()</span>
+<span class="comm-member">append_experiment()</span>
+<span class="comm-member">equivalent_doc_subclasses()</span>
+<span class="comm-member">print_extraction_summary()</span>
+<span class="comm-member">attach_pages_by_filename()</span>
+<span class="comm-member">.__init__()</span>
+<span class="comm-member" style="color:var(--dim)">+38 more</span>
+</div></div>
+<div class="comm-card" data-comm="34"><h3>Community 34</h3><div class="comm-size">47 nodes</div><div class="comm-members">
+<span class="comm-member">_RotatingFileSink</span>
+<span class="comm-member">load_env()</span>
+<span class="comm-member">.__call__()</span>
+<span class="comm-member">.__init__()</span>
+<span class="comm-member">setup_logging()</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">_print_human()</span>
+<span class="comm-member">_run()</span>
+<span class="comm-member">_aggregate()</span>
+<span class="comm-member">_cell()</span>
+<span class="comm-member" style="color:var(--dim)">+37 more</span>
+</div></div>
+<div class="comm-card" data-comm="18"><h3>Community 18</h3><div class="comm-size">46 nodes</div><div class="comm-members">
+<span class="comm-member">ArbiterAgent</span>
+<span class="comm-member">BossAgent</span>
+<span class="comm-member">ComplianceSpecialist</span>
+<span class="comm-member">CorporateRecordsSpecialist</span>
+<span class="comm-member">CompletenessJudge</span>
+<span class="comm-member">.arbitrate()</span>
+<span class="comm-member">.system_prompt()</span>
+<span class="comm-member">build_structured_schema()</span>
+<span class="comm-member">.adjudicate()</span>
+<span class="comm-member">.analyze_system_metrics()</span>
+<span class="comm-member" style="color:var(--dim)">+36 more</span>
+</div></div>
+<div class="comm-card" data-comm="41"><h3>Community 41</h3><div class="comm-size">45 nodes</div><div class="comm-members">
+<span class="comm-member">AgentSpec</span>
+<span class="comm-member">agent_fixture_path()</span>
+<span class="comm-member">cache_dir()</span>
+<span class="comm-member">fixture_file()</span>
+<span class="comm-member">intake_dir()</span>
+<span class="comm-member">load_agent_fixtures()</span>
+<span class="comm-member">load_jsonl()</span>
+<span class="comm-member">load_manifest()</span>
+<span class="comm-member">load_serving_fixtures()</span>
+<span class="comm-member">manifest_path()</span>
+<span class="comm-member" style="color:var(--dim)">+35 more</span>
+</div></div>
+<div class="comm-card" data-comm="12"><h3>Community 12</h3><div class="comm-size">43 nodes</div><div class="comm-members">
+<span class="comm-member">SorterAgent</span>
+<span class="comm-member">.review()</span>
+<span class="comm-member">build_structured_schema()</span>
+<span class="comm-member">classify_image()</span>
+<span class="comm-member">clean_prediction()</span>
+<span class="comm-member">extract_confidence()</span>
+<span class="comm-member">extract_reasoning()</span>
+<span class="comm-member">extract_runner_up()</span>
+<span class="comm-member">_valid_classes()</span>
+<span class="comm-member">format_sorter_subclass_catalogs()</span>
+<span class="comm-member" style="color:var(--dim)">+33 more</span>
+</div></div>
+<div class="comm-card" data-comm="14"><h3>Community 14</h3><div class="comm-size">42 nodes</div><div class="comm-members">
+<span class="comm-member">Bundle</span>
+<span class="comm-member">MetricDef</span>
+<span class="comm-member">MetricTier</span>
+<span class="comm-member">Registry</span>
+<span class="comm-member">bundle_metric_names()</span>
+<span class="comm-member">.metrics_for()</span>
+<span class="comm-member">get_bundle()</span>
+<span class="comm-member">list_bundles()</span>
+<span class="comm-member">validate_bundle()</span>
+<span class="comm-member">_doc()</span>
+<span class="comm-member" style="color:var(--dim)">+32 more</span>
+</div></div>
+<div class="comm-card" data-comm="16"><h3>Community 16</h3><div class="comm-size">42 nodes</div><div class="comm-members">
+<span class="comm-member">Interpretation</span>
+<span class="comm-member">InterpretationNote</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">bootstrap_ci()</span>
+<span class="comm-member">_clean()</span>
+<span class="comm-member">delta_significance()</span>
+<span class="comm-member">_resample_means()</span>
+<span class="comm-member">wilson_ci()</span>
+<span class="comm-member">best_run()</span>
+<span class="comm-member">confusion_drivers()</span>
+<span class="comm-member" style="color:var(--dim)">+32 more</span>
+</div></div>
+<div class="comm-card" data-comm="40"><h3>Community 40</h3><div class="comm-size">42 nodes</div><div class="comm-members">
+<span class="comm-member">_add_citation()</span>
+<span class="comm-member">analyze()</span>
+<span class="comm-member">_budget_shares()</span>
+<span class="comm-member">_category_from_question()</span>
+<span class="comm-member">_filing_type()</span>
+<span class="comm-member">_load_cuad()</span>
+<span class="comm-member">_load_full_texts()</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">main_with_args()</span>
+<span class="comm-member">make_figures()</span>
+<span class="comm-member" style="color:var(--dim)">+32 more</span>
+</div></div>
+<div class="comm-card" data-comm="31"><h3>Community 31</h3><div class="comm-size">41 nodes</div><div class="comm-members">
+<span class="comm-member">DebugLog</span>
+<span class="comm-member">DebugLogMiddleware</span>
+<span class="comm-member">_console()</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">save()</span>
+<span class="comm-member">.__init__()</span>
+<span class="comm-member">.record()</span>
+<span class="comm-member">.snapshot()</span>
+<span class="comm-member">.__call__()</span>
+<span class="comm-member">.__init__()</span>
+<span class="comm-member" style="color:var(--dim)">+31 more</span>
+</div></div>
+<div class="comm-card" data-comm="50"><h3>Community 50</h3><div class="comm-size">41 nodes</div><div class="comm-members">
+<span class="comm-member">SecurityHeadersMiddleware</span>
+<span class="comm-member">Hub</span>
+<span class="comm-member">create_app()</span>
+<span class="comm-member">lifespan()</span>
+<span class="comm-member">cors_origins()</span>
+<span class="comm-member">.dispatch()</span>
+<span class="comm-member">bind_loop()</span>
+<span class="comm-member">_forward()</span>
+<span class="comm-member">.broadcast()</span>
+<span class="comm-member">.connect()</span>
+<span class="comm-member" style="color:var(--dim)">+31 more</span>
+</div></div>
+<div class="comm-card" data-comm="48"><h3>Community 48</h3><div class="comm-size">41 nodes</div><div class="comm-members">
+<span class="comm-member">_agent_models()</span>
+<span class="comm-member">build_parser()</span>
+<span class="comm-member">_clone()</span>
+<span class="comm-member">_cmd_agents_list()</span>
+<span class="comm-member">_cmd_agents_show()</span>
+<span class="comm-member">_cmd_api()</span>
+<span class="comm-member">_cmd_cutover()</span>
+<span class="comm-member">_cmd_datasets_help()</span>
+<span class="comm-member">_cmd_datasets_prepare()</span>
+<span class="comm-member">_cmd_datasets_pull()</span>
+<span class="comm-member" style="color:var(--dim)">+31 more</span>
+</div></div>
+<div class="comm-card" data-comm="26"><h3>Community 26</h3><div class="comm-size">40 nodes</div><div class="comm-members">
+<span class="comm-member">Generation</span>
+<span class="comm-member">NodeSpan</span>
+<span class="comm-member">Score</span>
+<span class="comm-member">failure_class_from_text()</span>
+<span class="comm-member">normalize_failure_class()</span>
+<span class="comm-member">observation_type_for()</span>
+<span class="comm-member">format_causes()</span>
+<span class="comm-member">_as_dict()</span>
+<span class="comm-member">_as_doc_id()</span>
+<span class="comm-member">_both()</span>
+<span class="comm-member" style="color:var(--dim)">+30 more</span>
+</div></div>
+<div class="comm-card" data-comm="13"><h3>Community 13</h3><div class="comm-size">40 nodes</div><div class="comm-members">
+<span class="comm-member">_attachment()</span>
+<span class="comm-member">build_records()</span>
+<span class="comm-member">category_of()</span>
+<span class="comm-member">_clause_labels_from_data()</span>
+<span class="comm-member">clause_labels_from_local()</span>
+<span class="comm-member">list_pdf_paths()</span>
+<span class="comm-member">load_clause_labels()</span>
+<span class="comm-member">main()</span>
+<span class="comm-member">_norm()</span>
+<span class="comm-member">render_pdf_pages()</span>
+<span class="comm-member" style="color:var(--dim)">+30 more</span>
+</div></div>
+<div class="comm-card" data-comm="17"><h3>Community 17</h3><div class="comm-size">38 nodes</div><div class="comm-members">
+<span class="comm-member">EvalResultShim</span>
+<span class="comm-member">EvalRunShim</span>
+<span class="comm-member">LangfuseConfig</span>
+<span class="comm-member">AgentHandle</span>
+<span class="comm-member">LangfuseTracer</span>
+<span class="comm-member">TraceHandle</span>
+<span class="comm-member">_answer_task()</span>
+<span class="comm-member">load_local_documents()</span>
+<span class="comm-member">load_local_pdfs()</span>
+<span class="comm-member">load_task_dataset()</span>
+<span class="comm-member" style="color:var(--dim)">+28 more</span>
+</div></div>
+<div class="comm-card" data-comm="23"><h3>Community 23</h3><div class="comm-size">38 nodes</div><div class="comm-members">
+<span class="comm-member">ServingIdentity</span>
+<span class="comm-member">ServingObservation</span>
+<span class="comm-member">ServingRun</span>
+<span class="comm-member">aggregate_serving()</span>
+<span class="comm-member">_as_float()</span>
+<span class="comm-member">_as_int()</span>
+<span class="comm-member">_as_str()</span>
+<span class="comm-member">_cell()</span>
+<span class="comm-member">classify_serving_kind()</span>
+<span class="comm-member">compare_serving()</span>
+<span class="comm-member" style="color:var(--dim)">+28 more</span>
+</div></div>
+<div class="comm-card" data-comm="29"><h3>Community 29</h3><div class="comm-size">38 nodes</div><div class="comm-members">
+<span class="comm-member">ComplianceFilingExtraction</span>
+<span class="comm-member">ContractExtraction</span>
+<span class="comm-member">CorporateRecordExtraction</span>
+<span class="comm-member">CorrespondenceExtraction</span>
+<span class="comm-member">InsuranceClaimExtraction</span>
+<span class="comm-member">PipelineStage</span>
+<span class="comm-member">Matter</span>
+<span class="comm-member">_parse_resolve_payload()</span>
+<span class="comm-member">resolve_review()</span>
+<span class="comm-member">validate_extraction()</span>
+<span class="comm-member" style="color:var(--dim)">+28 more</span>
+</div></div>
+</div></section>
+<section id="gaps"><h2>Gap Analysis <span style="font-weight:400;color:var(--dim);font-size:.9rem">isolated nodes</span></h2>
+<p class="emptynote">15 nodes have minimal connections</p>
+<div class="lonely-grid">
+<div class="lonely-item">datasets/__init__.py</div>
+<div class="lonely-item">scripts/eval/__init__.py</div>
+<div class="lonely-item">llm-entity-extraction/scripts/__init__.py</div>
+<div class="lonely-item">reporting/__init__.py</div>
+<div class="lonely-item">src/agents/__init__.py</div>
+<div class="lonely-item">src/api/__init__.py</div>
+<div class="lonely-item">graph/__init__.py</div>
+<div class="lonely-item">src/llm/__init__.py</div>
+<div class="lonely-item">src/pipeline/__init__.py</div>
+<div class="lonely-item">src/scripts/__init__.py</div>
+<div class="lonely-item">src/storage/__init__.py</div>
+<div class="lonely-item">claims-data-eda</div>
+<div class="lonely-item">enron-evaluation-environment</div>
+<div class="lonely-item">mailroom-hub</div>
+<div class="lonely-item">the-mailroom</div>
 </div>
 </section>
-
-<section id="hubs">
-<h2>Community Hubs <span class="note" style="font-weight:400;font-size:.85rem">(click to filter)</span></h2>
-<div class="chips" id="hubs-chips"></div>
-</section>
-
-<section id="gods">
-<h2>God Nodes &mdash; most connected core abstractions</h2>
-<div class="panel" id="gods-list"></div>
-</section>
-
-<section id="conns">
-<h2>Surprising Connections <span class="note" style="font-weight:400;font-size:.85rem">(cross-community bridges)</span></h2>
-<ul class="surplist" id="surps-list"></ul>
-</section>
-
-<section id="cycles">
-<h2>Import Cycles</h2>
-<div class="panel"><span class="okpill">&#x2713; Monorepo-wide: no import cycles detected among production code.</span></div>
-</section>
-
-<section id="communities">
-<h2>Communities <span class="note" style="font-weight:400;font-size:.85rem">(325 total &middot; 150 shown)</span></h2>
-<div class="gridtools"><span id="count"></span></div>
-<div class="cgrid" id="cgrid"></div>
-</section>
-
-<section id="gaps">
-<h2>Knowledge Gaps</h2>
-<div id="gaps-list"></div>
-</section>
-
-<section id="questions">
-<h2>Suggested Questions</h2>
-<div id="questions-list"></div>
-</section>
-
-<footer>
-<span>mailroom-dev · knowledge graph · 2026-08-30</span>
-<span><a href="https://github.com/Exios66/mailroom-dev">github.com/Exios66/mailroom-dev</a></span>
-</footer>
 </main>
-<button id="totop" title="Back to top">&#x2191;</button>
-
 <script>
-const _B={g:'eJydVEtv1DAQ/iurnECqSFEp0N64c0DsEaGRSSZZg2ObsV21Qvx3xnFeXqfS0lvsme/hyWd/+1Op6v5QEf4OkhBQP7x6XV0dqpZ3b6/5Q8ayFc0v0aMDpQbu8dI/AT56Eo2XRoOjJiIheKkcbLgiUxcJuKNeOt7Yp+rv1WGSVka08IOE1J6C89AY3cl+dfHu9j9cFDywT58ZK6q5Qa4hWUIPUQo3zm4KZ/6EMAipyJhh/QgyQWGhQoIz2sXRBlUXqNxZQyg8grD2clMO6YHVea1hxa/zGMt1LOdan4Xuu+DwaAIlt6Pa28tHoCYGcCPFsnYLY3H+M8hOcIq0lIZiWtbjc0istKikxiwiO7mY++q9VHyZil+DnrVv7i4fxmBa5LsyS1BiKQaQ2nLlniNjyQzWr8fekX7+kiSwg5UoP3Yq56ItdiIoDz+d0Qqs8KcXiuOjRZIDF3nuPZS8+ZuRdeeWjob4Rnzqubg4+XihExFRjmMVKdJqWoiZb/SQ+uptX26Cfxy0pgnR4mYiHwofSSPL4dnWEkvm5ETAljobSo5bY5pw+zE9ekYt9t6/wJ5rTjgIxxtadshv5azrZurnDE7IekaODr//A1r7Q4g=',s:'eJzFkk1LAzEQhv/KkpOF1tw9W8FDRVpvpYQ0nbbDbj7MzFRF/O8mdSlSBBEWewnJk8zkfUKW74rUTaMMRckOTLAe6Gqkxo3iymfSMS6Oe5XlyoSA6qKti/uHu+l8Pr2tYFvAUiXrWrsD0k97mMwsdjlGrwnyAbL2FsN1equnfz7n+4kR1L5e3ierRauPcdPnhfAsIGAwrOPrt7yPmKDDAAsurf+cuAyBJ/6UObsvZE4o9f31GgOdi/xeTm4P3lKxDLgF4jOrDC6WVzLE4tpLWMU0vNRLRgZjZYP8j0rEMRekj/cO7iSp/Gc2m+jEl7oLeDnLtou7ocxWn8c6XEs=',c:'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',i:'eJyLVnLLTM1JCU7OL8rMSw9OLSkBUsVKOgpK1QqJBQUghlNRfnlxalF4Zl5KfjlIILMg2TcxMw/ELE4tLs7MhzAzUnNyFGpBTBdXN8dQn5D4AP+gEKVYAHmVH8I=',q:'eJzFlFFv2jAQx7/KKU8gASIQKN3LRFfYJnVtBZ14mCZinCOxFuzUdoqiiu++S8oGmK5l0tQ9JWf7zvf7/3P59ujde+/AmyUFRAoNhBfM4DBGaUPgSkrkFsIParXKpbAF+J1+CFbtL3XCxn7YdcL+YeyEfvfcWXDKBU493zk/6Dn7/sA54F7QC8L3XgO8dcn9ScQJLNCuEYnVGOBErllanqy1W+2gX4cm2EQYkCpCoCcDrpUxTf675EKLKMZWWdSWRZ/ieZngbRpwJPFUaYv6zyJ3jiTunTkquqo6+4OXRQyc9G47cEQ6cw+4vp27B44yXvOBvqS/8CH4Dz6QbI4RbUdH/zDuHH3LpxN2B/+McKiRCiEEIOQStcYINKbMCiVNIjJDyw8qfRAyhlBIkiDTaOfUDMdaPYQatuIWrIVNIPyIEnWVGQKTEYTXdNU0YzKsA+M2Z2lakHR0B7c71ueqJsxQQ5+vx6PJZHQJSH0bAl5RvbSpkRklqc+tC2WnhMAsSKTVB9RiKXjVxw6+Wi3mvxifEaB3ggCc7rY4Z1nmskd4n+MW+1ZkmAqJk/wV8sNyJXTvjaFPcf2KyXiZG5yqXHM8xN5HfYKfEyN9rAT0Irpb9C0dn5WZ21I02WOBaTSlFol2itbSw5Sz+QhkTAMutFob1DMhI7VugMj4FyZkAwzNJV1ILwmmKWzKlMvRePj16m5+ezO5q34HpcYajQW1rN5NYSyudjr4/T6skf1Ii+a2IeIpJ9TAUuWkZxMymmqxSJH+QzxfkbQVJ8SMXFIaVoK2yaZKsR29MIrsxKgad+Ntvv8EKyagPQ=='};
-function _D(b){return JSON.parse(pako.inflate(atob(b),{to:'string'}))}
-const GODS=_D(_B.g);
-const SURPRISES=_D(_B.s);
-const COMMUNITIES=_D(_B.c);
-const ISOLATED=_D(_B.i);
-const QUESTIONS=_D(_B.q);
-
-// Animate counters
-document.querySelectorAll('.num').forEach(el=>{
-  var target=+el.dataset.count||0,duration=1200,start=performance.now();
-  function update(t){var p=Math.min((t-start)/duration,1),v=Math.floor(p*target*(2-p));el.textContent=v;if(p<1)requestAnimationFrame(update);}
-  requestAnimationFrame(update);
+(function(){
+var q=document.getElementById('search');
+if(q){
+q.addEventListener('input',function(){
+var v=q.value.toLowerCase().trim();
+document.querySelectorAll('.comm-card').forEach(function(c){
+var t=c.querySelector('h3').textContent.toLowerCase();
+var ms=Array.from(c.querySelectorAll('.comm-member')).map(function(m){return m.textContent.toLowerCase()});
+c.style.display=(t.includes(v)||ms.some(function(m){return m.includes(v)}))?'':'none';
 });
-
-// God nodes bar chart
-var maxDeg=Math.max(...GODS.map(g=>g.d),1);
-var godsEl=document.getElementById('gods-list');
-GODS.forEach(g=>{
-  var pct=Math.round(g.d/maxDeg*100);
-  var row=document.createElement('div');row.className='godrow';
-  row.innerHTML='<div class="godname"><code>'+esc(g.l)+'</code></div><div class="godbarwrap"><div class="godbar" style="width:'+pct+'%"></div><span class="godval">'+g.d+'</span></div>';
-  godsEl.appendChild(row);
 });
-
-// Surprising connections
-var surpEl=document.getElementById('surps-list');
-SURPRISES.forEach(s=>{
-  var files=Array.isArray(s.f)?s.f.join(', '):s.f;
-  var li=document.createElement('li');li.className='surp';
-  li.innerHTML='<span class="edge"><code>'+esc(s.s)+'</code><span class="rel">&ndash;-'+esc(s.r)+'&rarr;</span><code>'+esc(s.t)+'</code></span><span class="badge amber">'+esc(s.k)+'</span><span class="paths">'+esc(files)+'</span>';
-  surpEl.appendChild(li);
-});
-
-// Community cards
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-var cgrid=document.getElementById('cgrid');
-var hubsChips=document.getElementById('hubs-chips');
-
-COMMUNITIES.forEach(c=>{
-  var card=document.createElement('article');card.className='ccard';
-  card.id='community-'+c.id;
-  var cohPct=Math.min(c.cohesion*100,100);
-  var searchText=c.name+' '+c.sample;
-  card.dataset.search=searchText.toLowerCase();
-  card.innerHTML='<div class="chead"><span class="cid">#'+String(c.id).padStart(3,'0')+'</span><h4>'+esc(c.name)+'</h4><span class="ccount">'+c.size+' nodes</span></div><div class="cohrow"><span class="cohlabel">cohesion</span><div class="cohmeter"><div class="cohfill" style="width:'+cohPct+'%"></div></div><span class="cohval">'+c.cohesion.toFixed(2)+'</span></div><p class="cprev">'+esc(c.sample)+'</p>';
-  cgrid.appendChild(card);
-
-  // Hub chip
-  var chip=document.createElement('button');chip.className='chip hub-chip';
-  chip.dataset.hub=c.name;chip.textContent=c.name;
-  chip.onclick=function(){filterCommunity(this.dataset.hub);};
-  hubsChips.appendChild(chip);
-});
-
-// Community filter
-function filterCommunity(name){
-  var cards=cgrid.querySelectorAll('.ccard');
-  var chips=document.querySelectorAll('.hub-chip');
-  chips.forEach(ch=>ch.style.borderColor='');
-  cards.forEach(card=>{
-    var match=card.dataset.search&&card.dataset.search.includes(name.toLowerCase());
-    card.classList.toggle('hide',!match);
-  });
-  document.querySelectorAll('.hub-chip').forEach(ch=>{
-    if(ch.textContent===name)ch.style.borderColor='var(--acc)';
-  });
-  updateCount();
+document.addEventListener('keydown',function(e){if(e.key==='/'){e.preventDefault();q.focus()}if(e.key==='Escape'){q.value='';q.dispatchEvent(new Event('input'));q.blur()}});
 }
-
-// Search filter
-var search=document.getElementById('search');
-search.addEventListener('input',function(){
-  var q=this.value.toLowerCase().trim();
-  var cards=cgrid.querySelectorAll('.ccard');
-  cards.forEach(card=>{
-    if(!q){card.classList.remove('hide');return;}
-    card.classList.toggle('hide',!(card.dataset.search||'').includes(q));
-  });
-  updateCount();
-});
-
-function updateCount(){
-  var visible=cgrid.querySelectorAll('.ccard:not(.hide)').length;
-  document.getElementById('count').textContent='Showing '+visible+'/'+COMMUNITIES.length+' communities';
-}
-updateCount();
-
-document.querySelectorAll('.hub-chip').forEach(ch=>{
-  ch.onclick=function(){filterCommunity(this.dataset.hub);};
-});
-
-// Knowledge gaps
-var gapsEl=document.getElementById('gaps-list');
-if(ISOLATED.length){
-  ISOLATED.forEach(function(s){
-    var card=document.createElement('div');card.className='gapcard';
-    card.innerHTML='<b>'+esc(s)+'</b> <span class="gapsub">(weakly-connected &mdash; possible undocumented component)</span>';
-    gapsEl.appendChild(card);
-  });
-}else{
-  gapsEl.innerHTML='<div class="panel note">No weakly-connected nodes detected.</div>';
-}
-
-// Suggested questions
-var questEl=document.getElementById('questions-list');
-QUESTIONS.forEach(function(q){
-  var det=document.createElement('details');det.className='qa';
-  det.innerHTML='<summary>'+esc(q.q)+'</summary><p>'+esc(q.w)+'</p>';
-  questEl.appendChild(det);
-});
-
-// Scroll progress
-document.addEventListener('scroll',function(){
-  var scrollTop=document.documentElement.scrollTop||document.body.scrollTop;
-  var scrollH=document.documentElement.scrollHeight-document.documentElement.clientHeight;
-  var pct=scrollH>0?(scrollTop/scrollH*100):0;
-  document.getElementById('progress').style.width=pct+'%';
-  document.getElementById('totop').classList.toggle('show',scrollTop>300);
-});
-document.getElementById('totop').addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+})();
 </script>
 </body>
 </html>
