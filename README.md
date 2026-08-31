@@ -10,10 +10,18 @@ The knowledge map spans the entire mailroom-dev monorepo — 9 workspace package
 
 | Page | What it is |
 |---|---|
-| [Architecture map](./index.html) | Default view. Three zoom levels: **layers → modules → symbols**. Conveyor strip jumps to the 13 LangGraph nodes. Comments hidden until you ask. Double-click isolates a neighborhood. |
+| [Architecture map](./index.html) | Default view. Three zoom levels: **layers → modules → symbols** (toolbar or double-click drill-down). Conveyor strip jumps to the 13 LangGraph nodes. ⛓ edge-type filter + inferred-edge toggle. ★ god-node spotlight. Double-click isolates a neighborhood. `/` searches symbols, files, and packages. |
 | [Module tree](./tree.html) | Filesystem collapsible tree of the same graph. |
 | [Report](./report.html) | God nodes, communities, bridges, suggested questions. |
 | [Classic vis](./graph.html) | Graphify's stock force-directed canvas, if you want the hairball. |
+
+## Reading the architecture map
+
+- **Symbols** — all 4,870 code symbols; double-click any node to isolate it + its neighbors.
+- **Modules** — 462 source files aggregated; node size = symbol count; double-click a module to open its symbols.
+- **Layers** — the 9 workspace packages; double-click a layer to focus it.
+- **⛓ edges** — filter the 12 relation types (`calls`, `imports`, `contains`, …) and the 571 inferred edges on/off.
+- **★ god nodes** — spotlight the 12 most-connected hubs from the report.
 
 ## Corpus
 

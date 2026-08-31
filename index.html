@@ -14,7 +14,6 @@
   .brand { font-weight:700; font-size:14px; color:#e4ecfa; white-space:nowrap; }
   .brand small { font-weight:400; opacity:.5; margin-left:6px; font-size:11px; }
   #stats { max-width:640px; width:100%; text-align:right; font-size:11px; line-height:1.55; color:#6b7a8f; overflow:hidden; }
-  #stats a { color:#4a7fc9; text-decoration:none; }
   #searchbox-wrap { position:absolute; top:56px; left:16px; z-index:20; }
   #searchbox { width:240px; padding:8px 10px; background:#131320; border:1px solid #2a2f40; border-radius:8px; color:#c8d0dc; font-size:13px; outline:none; transition:border-color .2s; }
   #searchbox:focus { border-color:#34d399; }
@@ -32,19 +31,38 @@
   .tooltip .tt-meta { color:#6b7a8f; font-size:11px; }
   #graph { width:100%; height:calc(100vh - 52px); position:absolute; top:52px; left:0; }
   footer { position:fixed; bottom:0; left:0; right:0; text-align:center; padding:6px; background:#0a0a0fcc; color:#3a4255; font-size:10px; z-index:10; }
-  #pipeline-strip { position:absolute; top:56px; left:50%; transform:translateX(-50%); z-index:15; display:flex; align-items:center; gap:4px; background:#0e0e14ee; border:1px solid #1f2533; border-radius:10px; padding:6px 10px; max-width:min(860px, calc(100vw - 300px)); overflow-x:auto; scrollbar-width:none; }
+  #pipeline-strip { position:absolute; top:56px; left:50%; transform:translateX(-50%); z-index:15; display:flex; align-items:center; gap:4px; background:#0e0e14ee; border:1px solid #1f2533; border-radius:10px; padding:6px 10px; max-width:min(720px, calc(100vw - 560px)); overflow-x:auto; scrollbar-width:none; }
   #pipeline-strip::-webkit-scrollbar { display:none; }
   .pipe-step { flex-shrink:0; padding:4px 9px; border-radius:7px; font-size:11px; color:#8fa0b4; cursor:pointer; border:1px solid transparent; transition:all .15s; white-space:nowrap; }
   .pipe-step:hover { color:#e4ecfa; background:#1a2030; }
   .pipe-step.active { color:#34d399; border-color:#34d39955; background:#12241d; }
   .pipe-step.missing { opacity:.35; cursor:not-allowed; }
   .pipe-arrow { color:#333c4e; font-size:10px; flex-shrink:0; user-select:none; }
-  #isolate-bar { position:absolute; top:56px; right:16px; z-index:20; display:none; align-items:center; gap:10px; background:#0e0e14ee; border:1px solid #2a2f40; border-radius:10px; padding:8px 12px; font-size:12px; color:#c8d0dc; }
-  #isolate-bar .iso-label { color:#34d399; font-weight:600; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  #isolate-bar button { background:#1a2030; border:1px solid #2a2f40; color:#c8d0dc; border-radius:6px; padding:3px 10px; font-size:11px; cursor:pointer; }
+  #toolbar { position:absolute; top:56px; right:16px; z-index:20; display:flex; gap:6px; }
+  .tb-btn { background:#0e0e14ee; border:1px solid #2a2f40; color:#8fa0b4; border-radius:8px; padding:6px 12px; font-size:11px; cursor:pointer; font-family:inherit; transition:all .15s; white-space:nowrap; }
+  .tb-btn:hover { color:#e4ecfa; border-color:#3a4356; }
+  .tb-btn.on { color:#34d399; border-color:#34d39966; background:#12241d; }
+  #mode-switch { display:flex; overflow:hidden; border-radius:8px; border:1px solid #2a2f40; }
+  #mode-switch .tb-btn { border:none; border-radius:0; border-right:1px solid #2a2f40; }
+  #mode-switch .tb-btn:last-child { border-right:none; }
+  #edge-panel { position:absolute; top:100px; right:16px; z-index:20; display:none; flex-direction:column; gap:4px; background:#0e0e14f2; border:1px solid #2a2f40; border-radius:10px; padding:12px 14px; font-size:11px; max-height:50vh; overflow:auto; }
+  #edge-panel h4 { font-size:11px; font-weight:600; color:#e4ecfa; letter-spacing:.4px; margin-bottom:2px; }
+  .rel-item { display:flex; align-items:center; gap:7px; padding:2px 0; cursor:pointer; user-select:none; color:#b0bcc8; }
+  .rel-item:hover { color:#e4ecfa; }
+  .rel-item.off { color:#4a5160; text-decoration:line-through; }
+  .rel-item input { accent-color:#34d399; cursor:pointer; }
+  .rel-count { color:#555f70; margin-left:auto; }
+  .rel-actions { display:flex; gap:6px; margin-top:4px; }
+  .rel-actions button { flex:1; background:#1a2030; border:1px solid #2a2f40; color:#8fa0b4; border-radius:6px; padding:3px 0; font-size:10px; cursor:pointer; font-family:inherit; }
+  .rel-actions button:hover { color:#34d399; border-color:#34d39966; }
+  .rel-sep { border-top:1px solid #1f2533; margin:5px 0; }
+  #isolate-bar { position:absolute; top:100px; right:16px; z-index:19; display:none; align-items:center; gap:10px; background:#0e0e14ee; border:1px solid #2a2f40; border-radius:10px; padding:8px 12px; font-size:12px; color:#c8d0dc; }
+  #isolate-bar .iso-label { color:#34d399; font-weight:600; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #isolate-bar button { background:#1a2030; border:1px solid #2a2f40; color:#c8d0dc; border-radius:6px; padding:3px 10px; font-size:11px; cursor:pointer; font-family:inherit; }
   #isolate-bar button:hover { border-color:#34d399; color:#34d399; }
   #status { position:absolute; bottom:34px; right:16px; z-index:15; background:#0e0e14cc; border:1px solid #1f2533; border-radius:8px; padding:5px 12px; font-size:11px; color:#6b7a8f; transition:opacity .4s; }
-  @media(max-width:800px){ header{padding:8px 12px} #searchbox-wrap{top:48px;left:12px} #legend{bottom:30px;left:8px;padding:10px 14px;max-height:32vh} #stats{display:none} .brand{font-size:13px} #graph{height:calc(100vh - 48px)} #pipeline-strip{top:48px;max-width:calc(100vw - 24px)} #isolate-bar{top:96px;right:8px} #status{display:none} }
+  @media(max-width:960px){ #pipeline-strip { display:none; } }
+  @media(max-width:800px){ header{padding:8px 12px} #searchbox-wrap{top:48px;left:12px} #searchbox{width:170px} #legend{bottom:30px;left:8px;padding:10px 14px;max-height:32vh} #stats{display:none} .brand{font-size:13px} #graph{height:calc(100vh - 48px)} #toolbar{top:48px;right:8px;flex-wrap:wrap;justify-content:flex-end;max-width:60vw} #edge-panel{top:96px;right:8px} #isolate-bar{top:96px;right:8px} #status{display:none} }
 </style>
 </head>
 <body>
@@ -52,14 +70,24 @@
   <div class="brand">mailroom-dev<small id="version"></small></div>
   <div id="stats"></div>
 </header>
-<div id="searchbox-wrap"><input type="text" id="searchbox" placeholder="/ search..." autocomplete="off" spellcheck="false"></div>
+<div id="searchbox-wrap"><input type="text" id="searchbox" placeholder="/ search symbols, files..." autocomplete="off" spellcheck="false"></div>
 <div id="pipeline-strip" title="LangGraph pipeline — click a node to jump"></div>
-<div id="isolate-bar"><span>⤧ isolated</span><span class="iso-label" id="iso-label"></span><button id="iso-reset">show all (Esc)</button></div>
+<div id="toolbar">
+  <div id="mode-switch">
+    <button class="tb-btn on" id="mode-symbols" title="One node per code symbol (4,870)">Symbols</button>
+    <button class="tb-btn" id="mode-modules" title="One node per source file (462)">Modules</button>
+    <button class="tb-btn" id="mode-layers" title="One node per workspace package (9)">Layers</button>
+  </div>
+  <button class="tb-btn" id="btn-gods" title="Spotlight the most-connected hub nodes">★ god nodes</button>
+  <button class="tb-btn" id="btn-edges" title="Filter edges by relation type">⛓ edges</button>
+</div>
+<div id="edge-panel"><h4>EDGE TYPES</h4><div id="rel-list"></div><div class="rel-sep"></div><div class="rel-item" id="rel-inferred"><input type="checkbox" checked><span>inferred edges</span><span class="rel-count" id="inferred-count"></span></div><div class="rel-actions"><button id="rel-all">all</button><button id="rel-none">none</button></div></div>
+<div id="isolate-bar"><span id="iso-kind">⤧ isolated</span><span class="iso-label" id="iso-label"></span><button id="iso-reset">show all (Esc)</button></div>
 <div id="legend"><h3>Layers</h3><div id="layers-list"></div></div>
 <div id="graph"></div>
 <div class="tooltip" id="tooltip"><div class="tt-title"></div><div class="tt-meta"></div></div>
 <div id="status">physics: stabilizing…</div>
-<footer>scroll to zoom · drag nodes · click a layer to filter · double-click a node to isolate · / to search</footer>
+<footer>scroll to zoom · drag nodes · click a layer to filter · double-click a node to isolate · double-click a module to open it · / to search</footer>
 
 <script src="./data.js"></script>
 <script>
@@ -71,6 +99,7 @@
   var EDGES = graphEdges;
   var LAYERS = graphLayers;
   var PIPELINE = graphPipeline;
+  var GODS = graphGods || [];
 
   var commitSha = '998922f0';
   var today = '2026-08-30';
@@ -81,9 +110,10 @@
   var nodeById = {};
   NODES.forEach(function(n){ nodeById[n.id] = n; });
   var layerColor = {};
-  LAYERS.forEach(function(L){ layerColor[L.id] = L.color; });
+  var layerTitle = {};
+  LAYERS.forEach(function(L){ layerColor[L.id] = L.color; layerTitle[L.id] = L.title; });
 
-  // Degree over VALID edges only (1,786 edges dangle; drop them once, up front)
+  // Drop dangling edges once, up front
   var VALID_EDGES = EDGES.filter(function(e){ return nodeById[e.f] && nodeById[e.t]; });
   var deg = {};
   VALID_EDGES.forEach(function(e){
@@ -98,165 +128,363 @@
     (adj[e.t] = adj[e.t] || []).push(e.f);
   });
 
-  // ---------- visibility state ----------
+  // Relation-type + inferred-edge counts (for the edge panel)
+  var relCounts = {};
+  var inferredCount = 0;
+  VALID_EDGES.forEach(function(e){
+    if (e.k === 'INFERRED') inferredCount++;
+    relCounts[e.r] = (relCounts[e.r] || 0) + 1;
+  });
+
+  // Module (per-file) and layer aggregates
+  var fileMeta = {};   // sf -> {layer, symbols:[ids]}
+  NODES.forEach(function(n){
+    var f = n.sf || '(unknown)';
+    if (!fileMeta[f]) fileMeta[f] = { layer: n.ly, symbols: [] };
+    fileMeta[f].symbols.push(n.id);
+  });
+  var layerCount = {};
+  NODES.forEach(function(n){ layerCount[n.ly] = (layerCount[n.ly] || 0) + 1; });
+
+  // Aggregated adjacency: symbols -> files -> layers, honoring current edge filters
+  function rollupEdges(keyFn){
+    var w = {};
+    VALID_EDGES.forEach(function(e){
+      if (hiddenRels[e.r]) return;
+      if (!showInferred && e.k === 'INFERRED') return;
+      var a = keyFn(e.f), b = keyFn(e.t);
+      if (!a || !b || a === b) return;
+      var k = a < b ? a + '\u0000' + b : b + '\u0000' + a;
+      w[k] = (w[k] || 0) + 1;
+    });
+    var out = [];
+    for (var k in w){
+      var pair = k.split('\u0000');
+      out.push({ a: pair[0], b: pair[1], w: w[k] });
+    }
+    return out;
+  }
+
+  // ---------- visibility / focus state ----------
   var hiddenLayers = {};
-  var isolated = null;       // node id when a neighborhood is isolated
-  var isolatedNb = null;     // Set of neighbor ids
+  var hiddenRels = {};
+  var showInferred = true;
+  var mode = 'symbols';           // 'symbols' | 'modules' | 'layers'
+  var isolated = null;            // symbol id when a neighborhood is isolated
+  var isolatedNb = null;          // Set of neighbor ids
+  var moduleFocus = null;         // sf when a single module is opened
+  var layerFocus = null;          // layer id when a single layer is focused
+  var godsOn = false;
 
-  function isVisible(n){
-    return !hiddenLayers[n.ly] && (!isolated || isolated === n.id || isolatedNb.has(n.id));
+  function symbolVisible(n){
+    if (hiddenLayers[n.ly]) return false;
+    if (moduleFocus && (n.sf || '(unknown)') !== moduleFocus) return false;
+    if (layerFocus && n.ly !== layerFocus) return false;
+    if (isolated && isolated !== n.id && !isolatedNb.has(n.id)) return false;
+    return true;
   }
-  function visibleNodes(){
-    return NODES.filter(isVisible);
-  }
+  function layerVisible(ly){ return !hiddenLayers[ly] && (!layerFocus || layerFocus === ly); }
 
-  // ---------- vis data ----------
+  // ---------- vis node/edge factories ----------
   var BASE_FONT = { size: 10, color: '#b0bcc8', face: 'Inter, Segoe UI, system-ui, sans-serif' };
   var DIM_FONT = { size: 10, color: '#39415a', face: BASE_FONT.face };
+  var HOT_FONT = { size: 11, color: '#f1f5f9', face: BASE_FONT.face };
 
-  function baseColor(n){
-    var c = layerColor[n.ly] || '#64748b';
-    return { background: c, border: c, highlight: { background: '#f8fafc', border: c }, hover: { background: '#f8fafc', border: c } };
+  function baseColor(color){
+    return { background: color, border: color, highlight: { background: '#f8fafc', border: color }, hover: { background: '#f8fafc', border: color } };
   }
+
   function toVisNode(n, pos){
     var v = {
       id: n.id,
       label: n.l,
-      color: baseColor(n),
+      color: baseColor(layerColor[n.ly] || '#64748b'),
       size: Math.max(3, Math.min(14, 3 + Math.sqrt(deg[n.id] || 0))),
       font: BASE_FONT,
       borderWidth: 0
     };
+    if (godsOn && godSet[n.id]) {
+      v.borderWidth = 2;
+      v.border = '#f8fafc';
+      v.color.border = '#f8fafc';
+      v.size = Math.max(v.size, 10);
+      v.font = { size: 12, color: '#f8fafc', face: BASE_FONT.face };
+    }
     if (pos) { v.x = pos.x; v.y = pos.y; }
     return v;
   }
+
+  function moduleVis(f, meta, pos){
+    var count = meta.symbols.length;
+    var base = f.split('/').pop();
+    var v = {
+      id: 'M:' + f,
+      label: base,
+      color: baseColor(layerColor[meta.layer] || '#64748b'),
+      size: Math.max(6, Math.min(34, 5 + Math.sqrt(count) * 1.7)),
+      font: BASE_FONT,
+      borderWidth: 0,
+      shape: 'diamond'
+    };
+    if (pos) { v.x = pos.x; v.y = pos.y; }
+    return v;
+  }
+
+  function layerVis(L, pos){
+    var v = {
+      id: 'LY:' + L.id,
+      label: L.title,
+      color: baseColor(L.color),
+      size: Math.max(12, Math.min(46, 10 + Math.sqrt(layerCount[L.id] || 0) * 1.1)),
+      font: { size: 13, color: '#e4ecfa', face: BASE_FONT.face },
+      borderWidth: 0,
+      shape: 'box'
+    };
+    if (pos) { v.x = pos.x; v.y = pos.y; }
+    return v;
+  }
+
   function toVisEdge(e){
     return { from: e.f, to: e.t, width: 0.4, color: { inherit: 'both', opacity: 0.12 } };
   }
-
-  // Preserve layout positions across rebuilds so layer toggles don't scatter the graph
-  function capturePositions(){
-    var pos = network ? network.getPositions() : {};
-    var out = {};
-    nodesDS.forEach(function(n){ if (pos[n.id]) out[n.id] = { x: pos[n.id].x, y: pos[n.id].y }; });
-    return out;
+  function aggEdge(e){
+    return { from: e.a, to: e.b, width: Math.min(4, 0.5 + Math.sqrt(e.w) * 0.4), color: { inherit: 'both', opacity: 0.2 } };
   }
 
-  var nodesDS = new vis.DataSet(visibleNodes().map(function(n){ return toVisNode(n); }));
-  var initVisible = visibleNodes();
-  var visIds = new Set(initVisible.map(function(n){ return n.id; }));
-  var edgesDS = new vis.DataSet(VALID_EDGES.filter(function(e){ return visIds.has(e.f) && visIds.has(e.t); }).map(toVisEdge));
+  function edgePasses(e){
+    return !hiddenRels[e.r] && (showInferred || e.k !== 'INFERRED');
+  }
+
+  // Position memo so switching modes doesn't scatter the layout
+  var posMemo = {};
+  function memoPositions(){
+    if (!network) return;
+    var pos = network.getPositions();
+    for (var id in pos) posMemo[id] = { x: pos[id].x, y: pos[id].y };
+  }
+
+  var godSet = {};
+  GODS.forEach(function(g){ godSet[g.id] = true; });
+
+  // ---------- dataset builders ----------
+  function buildSymbols(){
+    var ns = NODES.filter(symbolVisible);
+    var ids = new Set(ns.map(function(n){ return n.id; }));
+    var es = VALID_EDGES.filter(function(e){ return edgePasses(e) && ids.has(e.f) && ids.has(e.t); });
+    return {
+      nodes: ns.map(function(n){ return toVisNode(n, posMemo[n.id]); }),
+      edges: es.map(toVisEdge)
+    };
+  }
+  function buildModules(){
+    var ns = [], map = {};
+    for (var f in fileMeta){
+      var meta = fileMeta[f];
+      if (!layerVisible(meta.layer)) continue;
+      if (layerFocus && meta.layer !== layerFocus) continue;
+      map[f] = true;
+      ns.push(moduleVis(f, meta, posMemo['M:' + f]));
+    }
+    var es = rollupEdges(function(id){
+      var n = nodeById[id];
+      return n ? map[n.sf || '(unknown)'] ? (n.sf || '(unknown)') : null : null;
+    });
+    return { nodes: ns, edges: es.map(aggEdge) };
+  }
+  function buildLayers(){
+    var ns = LAYERS.filter(function(L){ return layerVisible(L.id); }).map(function(L){ return layerVis(L, posMemo['LY:' + L.id]); });
+    var es = rollupEdges(function(id){
+      var n = nodeById[id];
+      return n ? (layerVisible(n.ly) ? 'LY:' + n.ly : null) : null;
+    });
+    return { nodes: ns, edges: es.map(aggEdge) };
+  }
 
   // ---------- network ----------
   var container = document.getElementById('graph');
+  var PHYSICS = {
+    symbols: { barnesHut: { gravitationalConstant: -2600, centralGravity: 0.3, springLength: 110, springConstant: 0.02, damping: 0.4, avoidOverlap: 0.1 }, stabilization: { enabled: true, iterations: 220, fit: true } },
+    modules: { barnesHut: { gravitationalConstant: -1600, centralGravity: 0.25, springLength: 180, springConstant: 0.03, damping: 0.5, avoidOverlap: 0.3 }, stabilization: { enabled: true, iterations: 180, fit: true } },
+    layers:  { barnesHut: { gravitationalConstant: -900, centralGravity: 0.2, springLength: 320, springConstant: 0.04, damping: 0.6, avoidOverlap: 0.5 }, stabilization: { enabled: true, iterations: 160, fit: true } }
+  };
   var options = {
     autoResize: true,
     layout: { randomSeed: 42 },
-    physics: {
-      solver: 'barnesHut',
-      barnesHut: { gravitationalConstant: -2600, centralGravity: 0.3, springLength: 110, springConstant: 0.02, damping: 0.4, avoidOverlap: 0.1 },
-      stabilization: { enabled: true, iterations: 220, fit: true }
-    },
+    physics: PHYSICS.symbols,
     interaction: { hover: true, tooltipDelay: 200, navigationButtons: true, zoomView: true, dragView: true, hideEdgesOnDrag: true, selectConnectedEdges: false },
     nodes: { shape: 'dot', borderWidth: 0, font: BASE_FONT },
     edges: { smooth: false, selectionWidth: 1 }
   };
+  var nodesDS = new vis.DataSet([]);
+  var edgesDS = new vis.DataSet([]);
   var network = new vis.Network(container, { nodes: nodesDS, edges: edgesDS }, options);
 
+  var statusEl = document.getElementById('status');
   network.on('stabilizationIterationsDone', function(){
-    var s = document.getElementById('status');
-    if (s) { s.textContent = 'ready · ' + nodesDS.length + ' nodes'; setTimeout(function(){ s.style.opacity = '0'; }, 4000); }
+    statusEl.textContent = 'ready · ' + nodesDS.length + ' nodes';
+    memoPositions();
+    setTimeout(function(){ statusEl.style.opacity = '0'; }, 4000);
   });
 
   // ---------- tooltip ----------
   var tooltip = document.getElementById('tooltip');
-  var layerTitle = {};
-  LAYERS.forEach(function(L){ layerTitle[L.id] = L.title; });
-
   network.on('hoverNode', function(p){
-    var n = nodeById[p.node];
-    if (!n) return;
-    tooltip.querySelector('.tt-title').textContent = n.l;
-    tooltip.querySelector('.tt-meta').textContent =
-      'layer: ' + (layerTitle[n.ly] || n.ly) +
-      '\ndegree: ' + (deg[n.id] || 0) +
-      '\ncommunity: ' + (n.cn || n.c) +
-      '\nfile: ' + (n.sf || '?') + (n.loc ? ' @' + n.loc : '');
+    var id = p.node;
+    var t1, t2;
+    if (id.slice(0, 2) === 'M:') {
+      var f = id.slice(2), meta = fileMeta[f];
+      if (!meta) return;
+      t1 = f.split('/').pop();
+      t2 = f + '\n' + meta.symbols.length + ' symbols · layer: ' + (layerTitle[meta.layer] || meta.layer) + '\ndouble-click to open';
+    } else if (id.slice(0, 3) === 'LY:') {
+      var ly = id.slice(3);
+      t1 = layerTitle[ly] || ly;
+      t2 = (layerCount[ly] || 0) + ' symbols\ndouble-click to focus';
+    } else {
+      var n = nodeById[id];
+      if (!n) return;
+      t1 = n.l;
+      t2 = 'layer: ' + (layerTitle[n.ly] || n.ly) +
+        '\ndegree: ' + (deg[n.id] || 0) +
+        '\ncommunity: ' + (n.cn || n.c) +
+        (godsOn && godSet[id] ? '\n★ god node' : '') +
+        '\nfile: ' + (n.sf || '?') + (n.loc ? ' @' + n.loc : '');
+    }
+    tooltip.querySelector('.tt-title').textContent = t1;
+    tooltip.querySelector('.tt-meta').textContent = t2;
     tooltip.style.display = 'block';
   });
   network.on('dragging', function(){ tooltip.style.display = 'none'; });
   network.on('blurNode', function(){ tooltip.style.display = 'none'; });
-
-  // ---------- double-click isolate ----------
-  var isoBar = document.getElementById('isolate-bar');
-  var isoLabel = document.getElementById('iso-label');
-
-  function isolateNeighborhood(id){
-    isolated = id;
-    isolatedNb = new Set(adj[id] || []);
-    rebuild({ fit: true });
-    isoLabel.textContent = (nodeById[id] ? nodeById[id].l : id) + ' · ' + isolatedNb.size + ' neighbors';
-    isoBar.style.display = 'flex';
-  }
-  function resetIsolation(skipFit){
-    if (!isolated) return;
-    isolated = null;
-    isolatedNb = null;
-    isoBar.style.display = 'none';
-    rebuild({ fit: !skipFit });
-  }
-  document.getElementById('iso-reset').addEventListener('click', function(){ resetIsolation(); });
-
-  network.on('doubleClick', function(p){
-    if (p.nodes && p.nodes.length > 0) isolateNeighborhood(p.nodes[0]);
-    else resetIsolation();
-  });
+  network.on('zoom', function(){ tooltip.style.display = 'none'; });
 
   // ---------- rebuild / stats ----------
   var statsEl = document.getElementById('stats');
 
-  function rebuild(opts){
-    opts = opts || {};
-    var keep = capturePositions();
-    var ns = visibleNodes();
-    nodesDS.clear();
-    edgesDS.clear();
-    nodesDS.add(ns.map(function(n){ return toVisNode(n, keep[n.id]); }));
-    var ids = new Set(ns.map(function(n){ return n.id; }));
-    edgesDS.add(VALID_EDGES.filter(function(e){ return ids.has(e.f) && ids.has(e.t); }).map(toVisEdge));
-    if (opts.fit) network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
-    updateStats(ns);
+  function currentBuild(){
+    if (mode === 'modules') return buildModules();
+    if (mode === 'layers') return buildLayers();
+    return buildSymbols();
   }
 
-  function updateStats(ns){
-    if (ns === undefined) ns = visibleNodes();
-    var files = new Set(ns.map(function(n){ return n.sf; })).size;
+  function rebuild(opts){
+    opts = opts || {};
+    memoPositions();
+    var b = currentBuild();
+    nodesDS.clear();
+    edgesDS.clear();
+    nodesDS.add(b.nodes);
+    edgesDS.add(b.edges);
+    if (opts.fit) network.fit({ animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
+    updateStats(b);
+    if (opts.focusIds && opts.focusIds.length) {
+      network.selectNodes(opts.focusIds);
+      network.fit({ nodes: opts.focusIds, animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
+    }
+  }
+
+  var MODE_LABEL = { symbols: 'symbols', modules: 'modules', layers: 'layers' };
+  function updateStats(b){
+    if (b === undefined) b = currentBuild();
     var hidden = Object.keys(hiddenLayers).length;
-    var html = ns.length.toLocaleString() + ' symbols · ' + nodesDS.length + ' nodes · ' + edgesDS.length.toLocaleString() + ' edges shown · ' + files + ' files';
-    if (hidden) html += ' · ' + hidden + ' layer' + (hidden > 1 ? 's' : '') + ' hidden';
-    if (isolated) html += ' · isolated';
-    statsEl.innerHTML = html + '<br>' +
-      VALID_EDGES.length.toLocaleString() + ' edges total · tests/notebooks excluded<br>' +
+    var parts = [b.nodes.length.toLocaleString() + ' ' + MODE_LABEL[mode], b.edges.length.toLocaleString() + ' edges shown'];
+    if (mode === 'symbols') {
+      var files = new Set(NODES.filter(symbolVisible).map(function(n){ return n.sf; })).size;
+      parts.push(files + ' files');
+    }
+    if (hidden) parts.push(hidden + ' layer' + (hidden > 1 ? 's' : '') + ' hidden');
+    var off = Object.keys(hiddenRels).length;
+    if (off) parts.push(off + ' edge type' + (off > 1 ? 's' : '') + ' off');
+    if (!showInferred) parts.push('inferred off');
+    if (isolated || moduleFocus || layerFocus) parts.push('focused');
+    statsEl.innerHTML = parts.join(' · ') + '<br>' +
+      NODES.length.toLocaleString() + ' symbols · ' + VALID_EDGES.length.toLocaleString() + ' edges · tests/notebooks excluded<br>' +
       '<kbd>/</kbd> search · <kbd>Esc</kbd> clear';
   }
 
-  // ---------- legend ----------
+  // ---------- view modes ----------
+  var modeBtns = { symbols: document.getElementById('mode-symbols'), modules: document.getElementById('mode-modules'), layers: document.getElementById('mode-layers') };
+
+  function setMode(m, opts){
+    opts = opts || {};
+    if (mode !== m) {
+      memoPositions();
+      mode = m;
+      network.setOptions({ physics: PHYSICS[m] });
+    }
+    if (!opts.keepFocus) clearFocus(true);
+    for (var k in modeBtns) modeBtns[k].classList.toggle('on', k === m);
+    rebuild({ fit: opts.fit !== false });
+  }
+  modeBtns.symbols.addEventListener('click', function(){ setMode('symbols'); });
+  modeBtns.modules.addEventListener('click', function(){ setMode('modules'); });
+  modeBtns.layers.addEventListener('click', function(){ setMode('layers'); });
+
+  // ---------- focus (isolate / module open / layer focus) ----------
+  var isoBar = document.getElementById('isolate-bar');
+  var isoLabel = document.getElementById('iso-label');
+  var isoKind = document.getElementById('iso-kind');
+
+  function showIsoBar(kind, label){
+    isoKind.textContent = kind;
+    isoLabel.textContent = label;
+    isoBar.style.display = 'flex';
+  }
+  function clearFocus(skipRebuild){
+    var had = isolated || moduleFocus || layerFocus;
+    isolated = null; isolatedNb = null; moduleFocus = null; layerFocus = null;
+    isoBar.style.display = 'none';
+    if (had && !skipRebuild) rebuild({});
+  }
+  document.getElementById('iso-reset').addEventListener('click', function(){ clearFocus(); });
+
+  network.on('doubleClick', function(p){
+    if (!p.nodes || p.nodes.length === 0) { clearFocus(); return; }
+    var id = p.nodes[0];
+    if (id.slice(0, 2) === 'M:') {
+      var f = id.slice(2);
+      if (!fileMeta[f]) return;
+      moduleFocus = f;
+      isolated = null; isolatedNb = null; layerFocus = null;
+      showIsoBar('⤧ module', f + ' · ' + fileMeta[f].symbols.length + ' symbols');
+      if (mode !== 'symbols') setMode('symbols', { keepFocus: true });
+      else rebuild({ fit: true });
+    } else if (id.slice(0, 3) === 'LY:') {
+      layerFocus = id.slice(3);
+      isolated = null; isolatedNb = null; moduleFocus = null;
+      showIsoBar('⤧ layer', (layerTitle[layerFocus] || layerFocus) + ' · ' + (layerCount[layerFocus] || 0) + ' symbols');
+      if (mode !== 'symbols') setMode('symbols', { keepFocus: true });
+      else rebuild({ fit: true });
+    } else {
+      isolated = id;
+      isolatedNb = new Set(adj[id] || []);
+      moduleFocus = null; layerFocus = null;
+      showIsoBar('⤧ isolated', (nodeById[id] ? nodeById[id].l : id) + ' · ' + isolatedNb.size + ' neighbors');
+      rebuild({ fit: true });
+    }
+  });
+
+  // ---------- legend (layers) ----------
   var legendEl = document.getElementById('layers-list');
+  var layerItems = {};
   LAYERS.forEach(function(L){
-    var count = NODES.filter(function(n){ return n.ly === L.id; }).length;
     var item = document.createElement('div');
     item.className = 'layer-item';
     item.innerHTML = '<span class="layer-dot" style="background:' + L.color + '"></span>' +
       '<span class="layer-label">' + L.title + '</span>' +
-      '<span class="layer-count">' + count.toLocaleString() + '</span>';
-    item.title = L.blurb || L.id;
+      '<span class="layer-count">' + (L.count || layerCount[L.id] || 0).toLocaleString() + '</span>';
+    item.title = (L.blurb || L.id) + ' — click to show/hide';
     item.addEventListener('click', function(){
       if (hiddenLayers[L.id]) delete hiddenLayers[L.id]; else hiddenLayers[L.id] = true;
       item.classList.toggle('off', !!hiddenLayers[L.id]);
       rebuild({});
     });
+    layerItems[L.id] = item;
     legendEl.appendChild(item);
   });
+  function syncLegend(){
+    LAYERS.forEach(function(L){ layerItems[L.id].classList.toggle('off', !!hiddenLayers[L.id]); });
+  }
 
   // ---------- pipeline conveyor strip ----------
   var strip = document.getElementById('pipeline-strip');
@@ -271,18 +499,16 @@
     var step = document.createElement('span');
     step.className = 'pipe-step';
     step.textContent = p.label;
-    var target = nodeById['packages_llm_mailroom_src_graph_build_graph_' + p.symbol] ||
-      NODES.filter(function(n){ return n.id.slice(-('_' + p.symbol).length) === '_' + p.symbol; })[0];
+    var target = nodeById['packages_llm_mailroom_src_graph_build_graph_' + p.symbol];
     if (target) {
       step.addEventListener('click', function(){
-        resetIsolation(true);
+        clearFocus(true);
+        if (mode !== 'symbols') setMode('symbols', { keepFocus: true, fit: false });
         if (hiddenLayers[target.ly]) {
           delete hiddenLayers[target.ly];
-          Array.prototype.forEach.call(legendEl.children, function(el, idx){
-            el.classList.toggle('off', !!hiddenLayers[LAYERS[idx] && LAYERS[idx].id]);
-          });
+          syncLegend();
+          rebuild({ fit: false });
         }
-        rebuild({});
         network.selectNodes([target.id]);
         network.focus(target.id, { scale: 1.1, animation: { duration: 600, easingFunction: 'easeInOutQuad' } });
         stripSteps.forEach(function(s){ s.classList.remove('active'); });
@@ -295,44 +521,126 @@
     strip.appendChild(step);
   });
 
+  // ---------- god nodes ----------
+  var godsBtn = document.getElementById('btn-gods');
+  godsBtn.addEventListener('click', function(){
+    godsOn = !godsOn;
+    godsBtn.classList.toggle('on', godsOn);
+    if (mode !== 'symbols') setMode('symbols');
+    else rebuild({});
+    if (godsOn && GODS.length) {
+      network.selectNodes(GODS.map(function(g){ return g.id; }));
+    }
+  });
+
+  // ---------- edge-type filter ----------
+  var edgePanel = document.getElementById('edge-panel');
+  var edgesBtn = document.getElementById('btn-edges');
+  var relList = document.getElementById('rel-list');
+  var relItems = {};
+  Object.keys(relCounts).sort(function(a, b){ return relCounts[b] - relCounts[a]; }).forEach(function(r){
+    var item = document.createElement('label');
+    item.className = 'rel-item';
+    item.innerHTML = '<input type="checkbox" checked><span>' + r + '</span><span class="rel-count">' + relCounts[r].toLocaleString() + '</span>';
+    item.querySelector('input').addEventListener('click', function(ev){ ev.stopPropagation(); });
+    item.addEventListener('click', function(){
+      if (hiddenRels[r]) delete hiddenRels[r]; else hiddenRels[r] = true;
+      item.classList.toggle('off', !!hiddenRels[r]);
+      item.querySelector('input').checked = !hiddenRels[r];
+      rebuild({});
+    });
+    relItems[r] = item;
+    relList.appendChild(item);
+  });
+  document.getElementById('inferred-count').textContent = inferredCount.toLocaleString();
+  var inferredItem = document.getElementById('rel-inferred');
+  inferredItem.addEventListener('click', function(){
+    showInferred = !showInferred;
+    inferredItem.querySelector('input').checked = showInferred;
+    inferredItem.classList.toggle('off', !showInferred);
+    rebuild({});
+  });
+  document.getElementById('rel-all').addEventListener('click', function(){
+    hiddenRels = {}; showInferred = true;
+    for (var r in relItems) { relItems[r].classList.remove('off'); relItems[r].querySelector('input').checked = true; }
+    inferredItem.classList.remove('off'); inferredItem.querySelector('input').checked = true;
+    rebuild({});
+  });
+  document.getElementById('rel-none').addEventListener('click', function(){
+    hiddenRels = {}; Object.keys(relCounts).forEach(function(r){ hiddenRels[r] = true; }); showInferred = false;
+    for (var r in relItems) { relItems[r].classList.add('off'); relItems[r].querySelector('input').checked = false; }
+    inferredItem.classList.add('off'); inferredItem.querySelector('input').checked = false;
+    rebuild({});
+  });
+  edgesBtn.addEventListener('click', function(){
+    var open = edgePanel.style.display === 'flex';
+    edgePanel.style.display = open ? 'none' : 'flex';
+    edgesBtn.classList.toggle('on', !open);
+  });
+
   // ---------- search ----------
   var searchBox = document.getElementById('searchbox');
 
   function restoreColors(){
     var upd = nodesDS.get().map(function(n){
-      var orig = nodeById[n.id];
-      return { id: n.id, color: orig ? baseColor(orig) : baseColor(n), font: BASE_FONT };
+      return { id: n.id, color: baseColor(nodeColor(n.id)), font: BASE_FONT };
     });
     nodesDS.update(upd);
     network.unselectAll();
   }
+  function nodeColor(id){
+    if (id.slice(0, 2) === 'M:') return layerColor[(fileMeta[id.slice(2)] || {}).layer] || '#64748b';
+    if (id.slice(0, 3) === 'LY:') return layerColor[id.slice(3)] || '#64748b';
+    var n = nodeById[id];
+    return n ? (layerColor[n.ly] || '#64748b') : '#64748b';
+  }
 
   function applySearch(q){
-    if (!q) { restoreColors(); return; }
+    if (!q) {
+      if (godsOn) rebuild({});
+      else restoreColors();
+      return;
+    }
     var vis = nodesDS.get();
     var matches = vis.filter(function(n){
-      var orig = nodeById[n.id];
-      return orig && (
-        (orig.l || '').toLowerCase().indexOf(q) !== -1 ||
+      var origId = n.id.slice(0, 2) === 'M:' ? n.id.slice(2) : (n.id.slice(0, 3) === 'LY:' ? n.id.slice(3) : n.id);
+      var orig = nodeById[origId];
+      var label = orig ? orig.l : n.label;
+      return label.toLowerCase().indexOf(q) !== -1 ||
         n.id.toLowerCase().indexOf(q) !== -1 ||
-        (orig.sf || '').toLowerCase().indexOf(q) !== -1
-      );
+        (orig && orig.sf || '').toLowerCase().indexOf(q) !== -1;
     });
     var ids = matches.map(function(n){ return n.id; });
-    network.selectNodes(ids);
+    network.selectNodes(ids.slice(0, 200));
     var keep = new Set(ids);
-    ids.forEach(function(id){ (adj[id] || []).forEach(function(nb){ keep.add(nb); }); });
+    if (mode === 'symbols') {
+      ids.forEach(function(id){ (adj[id] || []).forEach(function(nb){ keep.add(nb); }); });
+    }
     var upd = vis.map(function(n){
-      if (keep.has(n.id)) {
-        return { id: n.id, font: { size: 10, color: '#f1f5f9', face: BASE_FONT.face } };
-      }
+      if (keep.has(n.id)) return { id: n.id, font: HOT_FONT };
       return { id: n.id, color: { background: '#1c2333', border: '#1c2333', highlight: { background: '#1c2333', border: '#1c2333' }, hover: { background: '#1c2333', border: '#1c2333' } }, font: DIM_FONT };
     });
     nodesDS.update(upd);
   }
 
   searchBox.addEventListener('input', function(){
-    applySearch(searchBox.value.toLowerCase().trim());
+    clearTimeout(applySearch._t);
+    applySearch._t = setTimeout(function(){
+      applySearch(searchBox.value.toLowerCase().trim());
+    }, 120);
+  });
+  searchBox.addEventListener('keydown', function(e){
+    if (e.key === 'Enter') {
+      var q = searchBox.value.toLowerCase().trim();
+      if (!q) return;
+      var first = nodesDS.get().filter(function(n){
+        var origId = n.id.slice(0, 2) === 'M:' ? n.id.slice(2) : (n.id.slice(0, 3) === 'LY:' ? n.id.slice(3) : n.id);
+        var orig = nodeById[origId];
+        var label = orig ? orig.l : n.label;
+        return label.toLowerCase().indexOf(q) !== -1 || n.id.toLowerCase().indexOf(q) !== -1;
+      })[0];
+      if (first) network.focus(first.id, { scale: 1.2, animation: { duration: 500, easingFunction: 'easeInOutQuad' } });
+    }
   });
 
   // ---------- keyboard ----------
@@ -347,16 +655,24 @@
         searchBox.blur();
       }
       stripSteps.forEach(function(s){ s.classList.remove('active'); });
-      resetIsolation();
+      edgePanel.style.display = 'none';
+      edgesBtn.classList.remove('on');
+      clearFocus();
     }
   });
 
   // ---------- boot ----------
-  updateStats();
-  setTimeout(function(){ network.fit({ animation: { duration: 600, easingFunction: 'easeInOutQuad' } }); }, 300);
+  setMode('symbols');
+  statusEl.textContent = 'physics: stabilizing…';
 
   // debug/automation hook
-  window.__grafify = { network: network, nodesDS: nodesDS, edgesDS: edgesDS, isolate: isolateNeighborhood, resetIsolation: resetIsolation, stats: updateStats };
+  window.__grafify = {
+    network: network, nodesDS: nodesDS, edgesDS: edgesDS,
+    isolate: function(id){ isolated = id; isolatedNb = new Set(adj[id] || []); rebuild({ fit: true }); },
+    clearFocus: clearFocus, setMode: setMode,
+    state: function(){ return { mode: mode, isolated: isolated, moduleFocus: moduleFocus, layerFocus: layerFocus, hiddenLayers: Object.keys(hiddenLayers), hiddenRels: Object.keys(hiddenRels), godsOn: godsOn, showInferred: showInferred }; },
+    stats: updateStats
+  };
 })();
 </script>
 </body>
