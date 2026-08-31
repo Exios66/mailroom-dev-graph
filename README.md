@@ -10,7 +10,7 @@ The knowledge map spans the entire mailroom-dev monorepo — 9 workspace package
 
 | Page | What it is |
 |---|---|
-| [Architecture map](./index.html) | Default view. Three zoom levels: **layers → modules → symbols** (toolbar or double-click drill-down). Conveyor strip jumps to the 13 LangGraph nodes. ⛓ edge-type filter + inferred-edge toggle. ★ god-node spotlight. Double-click isolates a neighborhood. `/` searches symbols, files, and packages. |
+| [Architecture map](./index.html) | Default view. Three zoom levels: **layers → modules → symbols** (toolbar or double-click drill-down). Conveyor strip jumps to the 13 LangGraph nodes. ⛓ edge-type filter. **⚡ LLM edge scan**: hidden connections, bridge nodes, inferred-edge spotlight with per-edge confidence. ★ god-node spotlight. Double-click isolates a neighborhood. `/` searches · `i` opens insights. |
 | [Module tree](./tree.html) | Filesystem collapsible tree of the same graph. |
 | [Report](./report.html) | God nodes, communities, bridges, suggested questions. |
 | [Classic vis](./graph.html) | Graphify's stock force-directed canvas, if you want the hairball. |
@@ -20,8 +20,11 @@ The knowledge map spans the entire mailroom-dev monorepo — 9 workspace package
 - **Symbols** — all 4,870 code symbols; double-click any node to isolate it + its neighbors.
 - **Modules** — 462 source files aggregated; node size = symbol count; double-click a module to open its symbols.
 - **Layers** — the 9 workspace packages; double-click a layer to focus it.
-- **⛓ edges** — filter the 12 relation types (`calls`, `imports`, `contains`, …) and the 571 inferred edges on/off.
+- **Edge semantics** — solid = AST-extracted, **dashed amber = LLM-inferred** (graphify's edge scan, 571 edges, avg confidence 0.89; hover any edge for its relation + confidence).
+- **⚡ insights** — data-driven navigation: top **hidden connections** (LLM-inferred and cross-package edges, ranked, click to jump), **bridge nodes** spanning the most packages (click to isolate), a **spotlight** that shows only inferred edges, and a **cross-package edges only** lens.
+- **⛓ edges** — filter the 12 relation types (`calls`, `imports`, `contains`, …) and the inferred edges on/off.
 - **★ god nodes** — spotlight the 12 most-connected hubs from the report.
+- **Labels** — culled by zoom level: far out only hubs are labeled, zoom in for everything.
 
 ## Corpus
 
@@ -45,3 +48,5 @@ graphify tree --graph /tmp/mailroom-dev/graphify-out/graph.json --output tree.ht
 ```
 
 Then regenerate `index.html` / `report.html` / `graph.html` from `graph.json` using the generator scripts.
+
+Note: `data.js` ends with `graphEdgeConf` — the per-edge confidence map for the LLM-inferred edges, joined from `graph.json` links (`source`, `target`, `relation` → `confidence_score`). Re-append it after any regeneration, or the ⚡ insights panel loses its confidence readout.
