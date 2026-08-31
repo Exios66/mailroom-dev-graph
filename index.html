@@ -1,410 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>mailroom-dev · knowledge graph</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%F0%9F%A6%89%3C/text%3E%3C/svg%3E">
-<script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"
-        integrity="sha384-Ux6phic9PEHJ38YtrijhkzyJ8yQlH8i/+buBR8s3mAZOJrP1gwyvAcIYl3GWtpX1"
-        crossorigin="anonymous"></script>
-<script src="./data.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://unpkg.com/vis-network@9.1.6/standalone/css/vis-network.min.css">
+<script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
 <style>
-:root{--bg:#0b1220;--panel:#0f172a;--panel2:#111c33;--line:rgba(148,163,184,.15);
---txt:#e2e8f0;--mut:#94a3b8;--dim:#64748b;--acc:#34d399;--acc2:#38bdf8;
---amber:#fbbf24;--rose:#fb7185;--mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--txt);
-font:14px/1.45 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;overflow:hidden}
-a{color:var(--acc2);text-decoration:none}
-a:hover{text-decoration:underline}
-header{display:flex;align-items:center;gap:.8rem;padding:.55rem 1rem;border-bottom:1px solid var(--line);
-background:rgba(11,18,32,.92);backdrop-filter:blur(10px);z-index:20;flex-wrap:wrap}
-.brand{font-weight:700;color:var(--acc);white-space:nowrap}
-.brand small{color:var(--mut);font-weight:500;margin-left:.4rem}
-nav.top{display:flex;gap:.15rem}
-nav.top a,nav.top span.on{padding:.28rem .7rem;border-radius:7px;color:var(--mut);font-size:.82rem}
-nav.top span.on{background:var(--panel2);color:var(--txt)}
-nav.top a:hover{color:var(--txt);background:var(--panel2);text-decoration:none}
-.searchwrap{margin-left:auto;position:relative}
-#search{background:var(--panel2);border:1px solid var(--line);border-radius:8px;color:var(--txt);
-padding:.38rem .7rem;font-size:.84rem;width:240px;outline:none}
-#search:focus{border-color:var(--acc);width:300px}
-#search-results{position:absolute;right:0;top:110%;width:340px;max-height:280px;overflow:auto;
-background:var(--panel);border:1px solid var(--line);border-radius:10px;display:none;z-index:40}
-.search-item{padding:.45rem .7rem;cursor:pointer;font-size:.8rem;border-left:3px solid transparent}
-.search-item:hover{background:var(--panel2)}
-.search-item .meta{color:var(--dim);font-size:.7rem;font-family:var(--mono)}
-.toolbar{display:flex;align-items:center;gap:.5rem;padding:.4rem 1rem;border-bottom:1px solid var(--line);
-background:var(--panel);flex-wrap:wrap}
-.seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{background:none;border:0;color:var(--mut);padding:.32rem .7rem;cursor:pointer;font-size:.78rem}
-.seg button.on{background:rgba(52,211,153,.15);color:var(--acc)}
-.chk{display:flex;align-items:center;gap:.35rem;color:var(--mut);font-size:.78rem;cursor:pointer}
-.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:8px;
-padding:.3rem .65rem;cursor:pointer;font-size:.78rem}
-.ghost:hover{border-color:var(--acc);color:var(--acc)}
-.crumb{color:var(--dim);font-size:.75rem;font-family:var(--mono);margin-left:.4rem}
-.crumb b{color:var(--acc2);font-weight:600;cursor:pointer}
-#pipe{display:flex;gap:.25rem;padding:.45rem 1rem;overflow-x:auto;border-bottom:1px solid var(--line);background:#0c1528}
-.pipe{flex:0 0 auto;border:1px solid var(--line);background:var(--panel);color:var(--mut);border-radius:7px;
-padding:.22rem .5rem;font-size:.7rem;cursor:pointer;white-space:nowrap}
-.pipe:hover,.pipe.on{border-color:var(--acc);color:var(--acc)}
-.layout{display:flex;height:calc(100% - 9.2rem)}
-#graph{flex:1;min-width:0}
-aside{width:300px;border-left:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;overflow:hidden}
-.sideh{padding:.7rem 1rem .4rem;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
-#info{padding:.2rem 1rem 1rem;font-size:.84rem;min-height:130px;border-bottom:1px solid var(--line)}
-#info .empty{color:var(--dim);font-style:italic}
-#info .field{margin:.2rem 0}
-#info b{color:var(--txt)}
-.nlink{display:block;padding:.15rem .4rem;margin:.12rem 0;border-radius:4px;cursor:pointer;font-size:.76rem;
-border-left:3px solid #333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nlink:hover{background:var(--panel2)}
-#layers{flex:1;overflow:auto;padding:.4rem .8rem 1rem}
-.litem{display:flex;align-items:center;gap:.5rem;padding:.28rem .2rem;cursor:pointer;border-radius:6px;font-size:.8rem}
-.litem:hover{background:var(--panel2)}
-.litem.dim{opacity:.35}
-.ldot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.lcount{margin-left:auto;color:var(--dim);font-family:var(--mono);font-size:.72rem}
-#stats{padding:.55rem 1rem;border-top:1px solid var(--line);font-size:.72rem;color:var(--dim)}
-kbd{font-family:var(--mono);font-size:.68rem;border:1px solid var(--line);border-radius:4px;padding:0 .28rem;color:var(--mut)}
-@media(max-width:800px){aside{display:none}.searchwrap{display:none}#search{width:140px}#pipe{flex-wrap:wrap}}
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter','Segoe UI',system-ui,sans-serif; background:#0a0a0f; color:#c8d0dc; overflow:hidden; }
+  header { display:flex; justify-content:space-between; align-items:center; padding:10px 16px; background:#0e0e14; border-bottom:1px solid #1f2533; position:relative; z-index:10; }
+  .brand { font-weight:700; font-size:14px; color:#e4ecfa; white-space:nowrap; }
+  .brand small { font-weight:400; opacity:.5; margin-left:6px; font-size:11px; }
+  #stats { max-width:620px; width:100%; text-align:right; font-size:11px; line-height:1.55; color:#6b7a8f; overflow:hidden; }
+  #stats a { color:#4a7fc9; text-decoration:none; }
+  #searchbox-wrap { position:absolute; top:52px; left:16px; z-index:20; }
+  #searchbox { width:240px; padding:8px 10px; background:#131320; border:1px solid #2a2f40; border-radius:8px; color:#c8d0dc; font-size:13px; outline:none; transition:border-color .2s; }
+  #searchbox:focus { border-color:#34d399; }
+  #legend { position:absolute; bottom:16px; left:16px; background:#0e0e14ee; border:1px solid #1f2533; border-radius:10px; padding:14px 18px; min-width:220px; font-size:12px; z-index:15; }
+  #legend h3 { font-size:13px; font-weight:600; color:#e4ecfa; margin-bottom:10px; letter-spacing:.4px; }
+  .layer-item { display:flex; align-items:center; gap:8px; padding:4px 0; cursor:pointer; }
+  .layer-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+  .layer-label { color:#b0bcc8; flex:1; }
+  .layer-count { color:#555; font-size:11px; }
+  .tooltip { position:absolute; background:#16162a; border:1px solid #2a2f40; border-radius:6px; padding:10px 14px; font-size:12px; pointer-events:none; z-index:20; max-width:280px; color:#c8d0dc; box-shadow:0 4px 12px rgba(0,0,0,.4); display:none; }
+  .tooltip .tt-title { font-weight:600; color:#e4ecfa; margin-bottom:4px; }
+  .tooltip .tt-meta { color:#6b7a8f; font-size:11px; }
+  footer { position:fixed; bottom:0; left:0; right:0; text-align:center; padding:6px; background:#0a0a0fcc; color:#3a4255; font-size:10px; z-index:10; }
+  @media(max-width:800px){ header{padding:8px 12px} #searchbox-wrap{top:48px;left:12px} #legend{bottom:8px;left:8px;padding:10px 14px} #stats{text-align:left;margin-top:0;width:auto;max-width:none} .brand{font-size:13px} }
 </style>
 </head>
 <body>
 <header>
-  <div class="brand">&#x1F989; mailroom-dev <small>graph &middot; 998922f0 &middot; 2026-08-30</small></div>
-  <nav class="top">
-    <span class="on">Map</span>
-    <a href="./tree.html">Tree</a>
-    <a href="./report.html">Report</a>
-    <a href="./graph.html">Classic</a>
-  </nav>
-  <div class="searchwrap">
-    <input id="search" type="search" placeholder="Search symbols, files&hellip;  /" autocomplete="off">
-    <div id="search-results"></div>
-  </div>
+  <div class="brand">mailroom-dev<small id="version"></small></div>
+  <div id="stats"></div>
 </header>
-<div class="toolbar">
-  <div class="seg" id="modes">
-    <button data-mode="layers" class="on">Architecture</button>
-    <button data-mode="files">Modules</button>
-    <button data-mode="symbols">Symbols</button>
-  </div>
-  <label class="chk"><input type="checkbox" id="hide-rat" checked> Hide comments</label>
-  <button class="ghost" id="btn-fit">Fit</button>
-  <button class="ghost" id="btn-iso" disabled>Clear isolate</button>
-  <span class="crumb" id="crumb">Architecture overview</span>
-</div>
-<div id="pipe" title="Click a conveyor node to focus its implementation"></div>
-<div class="layout">
-  <div id="graph"></div>
-  <aside>
-    <div class="sideh">Inspector</div>
-    <div id="info"><span class="empty">Click a node &mdash; or pick a conveyor stage above.</span></div>
-    <div class="sideh">Layers</div>
-    <div id="layers"></div>
-    <div id="stats">4870 production symbols &middot; 16161 edges &middot; 325 communities<br>
-    4870 nodes &middot; 462 files &middot; tests/notebooks/.opencode excluded<br>
-    <kbd>/</kbd> search &middot; <kbd>Esc</kbd> clear &middot; rebuilt from <a href="https://github.com/Exios66/mailroom-dev/commit/998922f0dd12107949a20a08489b88c3771e9030">mailroom-dev@998922f0</a>
-    </div>
-  </aside>
-</div>
+<div id="searchbox-wrap"><input type="text" id="searchbox" placeholder="/ search..."></div>
+<div id="legend"><h3>Layers</h3><div id="layers-list"></div></div>
+<div id="graph"></div>
+<div class="tooltip" id="tooltip"><div class="tt-title"></div><div class="tt-meta"></div></div>
+<footer>scroll to zoom · drag nodes &middot; click layers to filter</footer>
+
+<script src="./data.js"></script>
 <script>
-// DATA loaded from data.js - it's the nodes array
-// EDGES loaded from data.js - it's the edges array
-// Reconstruct full DATA object in original format
-const DATA = {nodes: DATA, edges: EDGES};
-const LAYER_COLOR = Object.fromEntries(LAYERS.map(l => [l.id, l.color]));
-const byId = Object.fromEntries(DATA.nodes.map(n => [n.id, n]));
-const hiddenLayers = new Set();
-let mode = 'layers';
-let focusLayer = null;
-let focusFile = null;
-let isolateId = null;
-let network = null;
-const nodesDS = new vis.DataSet([]);
-const edgesDS = new vis.DataSet([]);
+(function(){
+  // Assemble DATA object from separate variables
+  var DATA = { nodes: graphNodes, edges: graphEdges };
+  var LAYERS = graphLayers;
+  var PIPELINE = graphPipeline;
+  var GODS = graphGods;
+  var RELS = graphRels;
 
-function esc(s){return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function layerTitle(id){const x = LAYERS.find(l => l.id===id); return x ? x.title : id;}
+  document.getElementById('version').innerHTML = '· %s · %s'.replace('%s','COMMIT_SHA_PLACEHOLDER').replace('%s','TODAY_PLACEHOLDER');
 
-function neighbors(id){
-  const out = [];
-  DATA.edges.forEach(e => {
-    if (e.f===id) out.push(e.t);
-    else if (e.t===id) out.push(e.f);
-  });
-  return [...new Set(out)];
-}
-
-function visibleNodes(){
-  let ns = DATA.nodes;
-  if (document.getElementById('hide-rat').checked) ns = ns.filter(n => n.t !== 'rationale');
-  ns = ns.filter(n => !hiddenLayers.has(n.ly));
-  if (isolateId){
-    const keep = new Set([isolateId, ...neighbors(isolateId)]);
-    ns = ns.filter(n => keep.has(n.id));
+  // Compute degrees
+  var deg={};
+  DATA.edges.forEach(e=>{deg[e.f]=(deg[e.f]||0)+1;deg[e.t]=(deg[e.t]||0)+1});
+  
+  // Build visible node map
+  var hiddenLayers={};
+  function getVisibleNodes(){
+    var ns=DATA.nodes.filter(n=>!hiddenLayers[n.ly]);
+    var count={};ns.forEach(n=>{count[n.ly]=(count[n.ly]||0)+1});
+    return {nodes:ns,counts:count};
   }
-  if (mode==='files' && focusLayer) ns = ns.filter(n => n.ly===focusLayer);
-  if (mode==='symbols' && focusFile) ns = ns.filter(n => n.sf===focusFile);
-  else if (mode==='symbols' && focusLayer) ns = ns.filter(n => n.ly===focusLayer);
-  return ns;
-}
 
-function layerGraph(){
-  const ns = visibleNodes();
-  const count = {};
-  ns.forEach(n => {count[n.ly]=(count[n.ly]||0)+1;});
-  const nodes = LAYERS.filter(l => count[l.id]).map(l => ({
-    id: 'ly:'+l.id, label: l.title, color: {background:l.color,border:l.color,highlight:{background:'#fff',border:l.color}},
-    size: 18 + 28 * Math.sqrt(count[l.id]/Math.max(...Object.values(count))),
-    font: {size:14,color:'#e2e8f0',face:'system-ui'},
-    title: l.blurb + ' · ' + count[l.id] + ' nodes',
-    _kind:'layer', _layer:l.id
-  }));
-  const w = {};
-  DATA.edges.forEach(e => {
-    const a = byId[e.f], b = byId[e.t];
-    if (!a||!b||a.ly===b.ly) return;
-    if (hiddenLayers.has(a.ly)||hiddenLayers.has(b.ly)) return;
-    const k = [a.ly,b.ly].sort().join('|');
-    w[k]=(w[k]||0)+1;
-  });
-  const edges = Object.entries(w).map(([k,c],i) => {
-    const [a,b]=k.split('|');
-    return {id:i, from:'ly:'+a, to:'ly:'+b, width: Math.max(1, Math.min(8, c/40)),
-      color:{opacity:.45}, title:c+' cross-layer edges', arrows:{to:{enabled:false}}};
-  });
-  return {nodes, edges};
-}
+  // Network options
+  var options={
+    layout:{randomSeed:42,hierarchical:{enabled:false}},
+    physics:{barnesHut:{gravitationalConstant:-2800,centralGravity:0.3,springLength:120,springConstant:0.008,damping:0.09},minVelocity:0.75},
+    interaction:{hover:true,tooltipDelay:200,zoomView:true,navigationButtons:true,kinetic:{maxVelocity:150,minimumBounceLimit:60,smoothDelay:100,smoothDirection:1,timelineThreshold:50},hideEdgesOnZoom:false,hideNodesOnZoom:false,maxPhysicalIterations:2000,dragNodes:true,dragView:true,clickToUse:true},
+    nodes:{shape:'dot',size:4,font:{size:10,color:'#b0bcc8'},borderWidth:0,shadow:false},
+    edges:{width:0.4,color:{inherit:'direction',opacity:0.15},smooth:{type:'continuous',roundness:0.1},arrows:{to:{enabled:false}},selectionWidth:0},
+  };
 
-function fileGraph(){
-  const ns = visibleNodes();
-  const files = {};
-  ns.forEach(n => {
-    const f = n.sf || '(unattributed)';
-    if (!files[f]) files[f] = {id:'f:'+f, file:f, ly:n.ly, n:0, d:0};
-    files[f].n++; files[f].d += n.d;
-  });
-  const arr = Object.values(files);
-  const maxd = Math.max(...arr.map(x=>x.d),1);
-  const nodes = arr.map(x => ({
-    id: x.id, label: (x.file.split('/').pop() || x.file),
-    color: {background:LAYER_COLOR[x.ly]||'#64748b', border:LAYER_COLOR[x.ly]||'#64748b', highlight:{background:'#fff', border:LAYER_COLOR[x.ly]}},
-    size: 10 + 26 * (x.d/maxd),
-    font: {size: x.d>maxd*0.18?12:0, color:'#e2e8f0'},
-    title: x.file + ' · ' + x.n + ' symbols',
-    _kind:'file', _file:x.file, _layer:x.ly
-  }));
-  const w = {};
-  DATA.edges.forEach(e => {
-    const a = byId[e.f], b = byId[e.t];
-    if (!a||!b) return;
-    const fa = a.sf||'(unattributed)', fb = b.sf||'(unattributed)';
-    if (fa===fb) return;
-    if (hiddenLayers.has(a.ly)||hiddenLayers.has(b.ly)) return;
-    if (focusLayer && a.ly!==focusLayer && b.ly!==focusLayer) return;
-    const k = [fa,fb].sort().join('|');
-    w[k]=(w[k]||0)+1;
-  });
-  const edges = Object.entries(w).map(([k,c],i) => {
-    const [a,b]=k.split('|');
-    return {id:i, from:'f:'+a, to:'f:'+b, width: Math.max(1, Math.min(6, c/8)),
-      color:{opacity:.4}, title:c+' edges', arrows:{to:{enabled:false}}};
-  });
-  return {nodes, edges};
-}
+  // Create dataset views
+  var edgesDS=new vis.DataSet(DATA.edges.map(e=>({id:e.f+'_'+e.t,from:e.f,to:e.t,label:e.r!==undefined&&e.r?'':'',group:e.r||'default',physics:true})));
+  var {nodes:allNodes}=getVisibleNodes();
+  var nodesDS=new vis.DataSet(allNodes.map(n=>({...n, PhysicsOptions:true, borderWidth:0, size:Math.max(3,Math.min(12,Math.sqrt(deg[n.id]||0))))})));
 
-function symbolGraph(){
-  const ns = visibleNodes();
-  const ids = new Set(ns.map(n=>n.id));
-  const maxd = Math.max(...ns.map(n=>n.d),1);
-  const nodes = ns.map(n => ({
-    id: n.id, label: n.l,
-    color: {background:LAYER_COLOR[n.ly]||'#64748b', border:LAYER_COLOR[n.ly]||'#64748b', highlight:{background:'#fff', border:LAYER_COLOR[n.ly]}},
-    size: 8 + 22 * (n.d/maxd),
-    font: {size: n.d>=maxd*0.22?12:0, color:'#e2e8f0'},
-    title: n.l+'\n'+(n.sf||'')+(n.loc?' '+n.loc:'')+'\n'+n.cn+' · deg '+n.d,
-    _kind:'symbol'
-  }));
-  const edges = [];
-  DATA.edges.forEach((e,i) => {
-    if (!ids.has(e.f) || !ids.has(e.t)) return;
-    edges.push({
-      id:i, from:e.f, to:e.t,
-      width: e.r==='calls'?2:1,
-      dashes: e.k!=='EXTRACTED',
-      color: {opacity: e.r==='imports'||e.r==='contains'?0.25:0.55},
-      title: e.r+' ['+e.k+']',
-      arrows: {to: {enabled: e.r==='calls'||e.r==='inherits'||e.r==='uses', scaleFactor:.45}}
+  // Network container
+  var container=document.getElementById('graph');
+  var network=new vis.Network(container,{nodes:nodesDS,edges:edgesDS},options);
+
+  // Tooltip
+  var tooltip=document.getElementById('tooltip');
+  network.on('hoverNode',function(p){
+    var n=nodesDS.get(p.node);if(!n)return;
+    tooltip.querySelector('.tt-title').textContent=n.l||n.id;
+    tooltip.querySelector('.tt-meta').textContent='deg: '+(deg[n.id]||0)+'\nid: '+n.id+'\nfile: '+n.sf;
+    tooltip.style.display='block';
+  });
+  network.on('moveNode',function(){});
+  network.on('blurNode',function(){tooltip.style.display='none'});
+  network.on('hoverEdge',function(){});
+  network.on('blurEdge',function(){});
+
+  // Hover styling
+  network.setOptions({nodes:{color:{backgroundColor:'#34d399',border:'#fff'},hover:{backgroundColor:'#4ade80',border:'#fff'}}});
+
+  // Stats
+  var statsEl=document.getElementById('stats');
+  statsEl.innerHTML=allNodes.length+' production symbols · '+DATA.edges.length+' edges · '+Object.keys(hiddenLayers).length+' hidden layers<br>';
+  statsEl.innerHTML+='%d nodes · %d files · tests/notebooks/.opencode excluded<br>'.replace('%d',allNodes.length).replace('%d',new Set(allNodes.map(n=>n.sf)).size);
+  statsEl.innerHTML+='<kbd>/</kbd> search · <kbd>Esc</kbd> clear';
+
+  // Legend
+  var legendEl=document.getElementById('layers-list');
+  var allHidden=Object.keys(hiddenLayers).length===0;
+  LAYERS.forEach(function(L){
+    var c=allHidden?LAYERS.length:LAYERS.filter(l=>!hiddenLayers[l.id]).length;
+    var item=document.createElement('div');item.className='layer-item';
+    item.innerHTML='<span class="layer-dot" style="background:'+L.color+'"></span><span class="layer-label">'+L.title+'</span><span class="layer-count">'+c+'</span>';
+    item.addEventListener('click',function(){
+      if(!hiddenLayers[L.id]){hiddenLayers[L.id]=true}else{delete hiddenLayers[L.id]}
+      rebuild();updateLegend();updateStats();
     });
+    legendEl.appendChild(item);
   });
-  return {nodes, edges};
-}
 
-function rebuild(){
-  const g = mode==='layers' ? layerGraph() : mode==='files' ? fileGraph() : symbolGraph();
-  nodesDS.clear(); edgesDS.clear();
-  nodesDS.add(g.nodes); edgesDS.add(g.edges);
-  if (network){
-    network.setOptions({physics:{enabled:true}});
-    network.once('stabilizationIterationsDone', () => network.setOptions({physics:{enabled:false}}));
+  function rebuild(){
+    var {nodes,counts}=getVisibleNodes();
+    nodesDS.clear();edgesDS.clear();
+    nodes.forEach(function(n){nodesDS.add({...n,PhysicsOptions:true,borderWidth:0,size:Math.max(3,Math.min(12,Math.sqrt(deg[n.id]||0)))})});
+    DATA.edges.forEach(function(e){if(nodes.find(n=>n.id===e.f)&&nodes.find(n=>n.id===e.t))edgesDS.add({id:e.f+'_'+e.t,from:e.f,to:e.t,label:e.r!==undefined&&e.r?'':'',group:e.r||'default',physics:true})});
   }
-  const c = document.getElementById('crumb');
-  if (mode==='layers') c.innerHTML = 'Architecture overview &mdash; click a layer to open its modules';
-  else if (mode==='files') c.innerHTML = focusLayer ? '<b data-up="layers">'+esc(layerTitle(focusLayer))+'</b> / modules' : 'All modules';
-  else{
-    const bits = [];
-    if (focusLayer) bits.push('<b data-up="layers">'+esc(layerTitle(focusLayer))+'</b>');
-    if (focusFile) bits.push('<b data-up="files">'+esc(focusFile.split('/').pop())+'</b>');
-    c.innerHTML = (bits.join(' / ')||'Symbols') + (isolateId?' &middot; isolated neighborhood':'');
-  }
-  document.getElementById('btn-iso').disabled = !isolateId;
-}
 
-function setMode(m, opts){
-  mode = m; if (!opts.keep) { isolateId = null; }
-  if (m==='layers'){ focusLayer=null; focusFile=null; }
-  document.querySelectorAll('#modes button').forEach(b => b.classList.toggle('on', b.dataset.mode===m));
-  rebuild();
-}
+  function updateLegend(){LAYERS.forEach(function(L){var c=LAYERS.filter(l=>!hiddenLayers[l.id]).length;var dots=legendEl.querySelectorAll('.layer-dot');dots.forEach(function(d,i){})});}
+  function updateStats(){statsEl.innerHTML=getVisibleNodes().nodes.length+' production symbols · '+DATA.edges.length+' edges · '+Object.keys(hiddenLayers).length+' hidden layers<br>'+document.getElementById('stats').querySelectorAll('br')[0].parentNode.innerHTML;}
 
-function showInfo(id){
-  const n = nodesDS.get(id);
-  if (!n) return;
-  if (n._kind==='layer'){
-    const L = LAYERS.find(x => x.id===n._layer);
-    document.getElementById('info').innerHTML = '<div class="field"><b>'+esc(L.title)+'</b></div><div class="field">'+esc(L.blurb)+'</div><div class="field">Nodes: '+L.count+'</div><div class="field" style="margin-top:.5rem;color:#94a3b8">Click again to open modules</div>';
-    return;
-  }
-  if (n._kind==='file'){
-    const kids = DATA.nodes.filter(x => x.sf===n._file).sort((a,b)=>b.d-a.d).slice(0,12);
-    document.getElementById('info').innerHTML = '<div class="field"><b>'+esc(n._file)+'</b></div><div class="field">Layer: '+esc(layerTitle(n._layer))+'</div>'
-      + kids.map(k => '<span class="nlink" data-nid="'+esc(k.id)+'" style="border-left-color:'+LAYER_COLOR[k.ly]+'">'+esc(k.l)+'</span>').join('');
-    return;
-  }
-  const s = byId[id];
-  if (!s) return;
-  const nbs = neighbors(id).map(i=>byId[i]).filter(Boolean).sort((a,b)=>b.d-a.d).slice(0,16);
-  document.getElementById('info').innerHTML = '<div class="field"><b>'+esc(s.l)+'</b></div><div class="field">Type: '+esc(s.t)+' &middot; degree '+s.d+'</div>'
-    + '<div class="field">Layer: '+esc(layerTitle(s.ly))+'</div><div class="field">Community: '+esc(s.cn)+'</div>'
-    + '<div class="field">Source: '+esc(s.sf||'&#8212;')+' '+esc(s.loc)+'</div>'
-    + (nbs.length?'<div class="field" style="margin-top:.5rem;color:#94a3b8">Neighbors</div>':'')
-    + nbs.map(k => '<span class="nlink" data-nid="'+esc(k.id)+'" style="border-left-color:'+LAYER_COLOR[k.ly]+'">'+esc(k.l)+'</span>').join('');
-}
-
-function focusSymbol(id){
-  const s = byId[id];
-  if (!s) return;
-  focusLayer = s.ly; focusFile = s.sf; isolateId = id;
-  setMode('symbols', {keep:true});
-  network.selectNodes([id]);
-  network.focus(id, {scale:1.4, animation:true});
-  showInfo(id);
-}
-
-const container = document.getElementById('graph');
-network = new vis.Network(container, {nodes:nodesDS, edges:edgesDS}, {
-  physics: {enabled:true, solver:'forceAtlas2Based',
-    forceAtlas2Based:{gravitationalConstant:-50, centralGravity:0.01, springLength:90, springConstant:0.08, damping:0.45, avoidOverlap:0.7},
-    stabilization:{iterations:180, fit:true}},
-  interaction: {hover:true, tooltipDelay:80, hideEdgesOnDrag:true, navigationButtons:false, keyboard:false, zoomView:true},
-  nodes: {shape:'dot', borderWidth:1.4},
-  edges: {smooth:{type:'continuous', roundness:0.25}, selectionWidth:3}
-});
-
-network.once('stabilizationIterationsDone', () => network.setOptions({physics:{enabled:false}}));
-
-network.on('click', params => {
-  if (!params.nodes.length) return;
-  const id = params.nodes[0];
-  const n = nodesDS.get(id);
-  showInfo(id);
-  if (n._kind==='layer'){ focusLayer=n._layer; focusFile=null; setMode('files'); }
-  else if (n._kind==='file'){ focusFile=n._file; focusLayer=n._layer; setMode('symbols'); }
-});
-
-network.on('doubleClick', params => {
-  if (!params.nodes.length) return;
-  const id = params.nodes[0];
-  const n = nodesDS.get(id);
-  if (n._kind==='symbol'){ isolateId = isolateId===id ? null : id; rebuild(); network.selectNodes([id]); showInfo(id); }
-});
-
-document.getElementById('modes').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b) return; setMode(b.dataset.mode);
-});
-
-document.getElementById('hide-rat').addEventListener('change', rebuild);
-document.getElementById('btn-fit').addEventListener('click', () => network.fit({animation:true}));
-document.getElementById('btn-iso').addEventListener('click', () => { isolateId=null; rebuild(); });
-
-document.getElementById('crumb').addEventListener('click', e => {
-  const up = e.target.dataset.up; if (!up) return;
-  if (up==='layers') setMode('layers');
-  if (up==='files'){ focusFile=null; setMode('files'); }
-});
-
-document.addEventListener('click', e => {
-  const el = e.target.closest('.nlink'); if (!el) return; focusSymbol(el.dataset.nid);
-});
-
-const layerEl = document.getElementById('layers');
-LAYERS.forEach(l => {
-  const item = document.createElement('div'); item.className = 'litem';
-  item.innerHTML = '<div class="ldot" style="background:'+l.color+'"></div><span>'+esc(l.title)+'</span><span class="lcount">'+l.count+'</span>';
-  item.onclick = () => {
-    if (hiddenLayers.has(l.id)){ hiddenLayers.delete(l.id); item.classList.remove('dim'); }
-    else { hiddenLayers.add(l.id); item.classList.add('dim'); }
-    rebuild();
-  };
-  item.ondblclick = ev => {
-    ev.preventDefault(); focusLayer=l.id; focusFile=null; hiddenLayers.clear();
-    document.querySelectorAll('.litem').forEach(x => x.classList.remove('dim')); setMode('files');
-  };
-  layerEl.appendChild(item);
-});
-
-const pipe = document.getElementById('pipe');
-PIPELINE.forEach(p => {
-  const b = document.createElement('button'); b.className = 'pipe'; b.textContent = p.label; b.title = p.symbol;
-  b.onclick = () => {
-    document.querySelectorAll('.pipe').forEach(x => x.classList.remove('on')); b.classList.add('on');
-    const hits = DATA.nodes.filter(n => n.l===p.symbol || n.l===p.symbol+'()' || n.id.endsWith('_'+p.symbol));
-    if (hits.length) focusSymbol(hits[0].id);
-    else {
-      const h2 = DATA.nodes.filter(n => n.l.toLowerCase().includes(p.id.replace('_',' ')) || n.l.toLowerCase().includes(p.symbol.toLowerCase()));
-      if (h2.length) focusSymbol(h2[0].id);
-    }
-  };
-  pipe.appendChild(b);
-});
-
-const search = document.getElementById('search'), results = document.getElementById('search-results');
-search.addEventListener('input', () => {
-  const q = search.value.toLowerCase().trim();
-  results.innerHTML = '';
-  if (!q){ results.style.display='none'; return; }
-  const matches = DATA.nodes.filter(n => n.l.toLowerCase().includes(q) || (n.sf||'').toLowerCase().includes(q)).slice(0,24);
-  if (!matches.length){ results.style.display='none'; return; }
-  results.style.display = 'block';
-  matches.forEach(n => {
-    const el = document.createElement('div'); el.className = 'search-item'; el.style.borderLeftColor = LAYER_COLOR[n.ly]||'#555';
-    el.innerHTML = esc(n.l) + '<div class="meta">'+esc(n.sf||'')+' · '+esc(layerTitle(n.ly))+'</div>';
-    el.onclick = () => { focusSymbol(n.id); results.style.display='none'; search.value=''; };
-    results.appendChild(el);
+  // Search
+  var searchBox=document.getElementById('searchbox');
+  searchBox.addEventListener('input',function(){
+    var q=searchBox.value.toLowerCase().trim();
+    if(!q){network.selectNodes([]);network.setOptions({nodes:{fontSize:10,color:'#b0bcc8'}});return}
+    var matches=nodesDS.get().filter(n=>(n.l||'').toLowerCase().includes(q)||(n.id||'').toLowerCase().includes(q)||(n.sf||'').toLowerCase().includes(q));
+    var ids=matches.map(n=>n.id);
+    network.selectNodes(ids);
+    var neighbors=new Set(ids);
+    DATA.edges.forEach(function(e){if(ids.includes(e.f))neighbors.add(e.t);if(ids.includes(e.t))neighbors.add(e.f)});
+    var keepIds=new Array(neighbors.size);var idx=0;neighbors.forEach(function(id){keepIds[idx++]=id});
+    var allNodesList=nodesDS.get();
+    var allIds=allNodesList.map(function(n){return n.id});
+    allIds.forEach(function(id){
+      var n=allNodesList.find(x=>x.id===id);
+      if(n){n.color=neighbors.has(id)?{backgroundColor:'#34d399',border:'#fff'}:{color:{fill:'#1a1a2e',stroke:'#1a1a2e'},borderColor:'#1a1a2e'}};
+    });
+    nodesDS.update(allNodesList);
   });
-});
 
-document.addEventListener('click', e => { if(!results.contains(e.target) && e.target!==search) results.style.display='none'; });
-document.addEventListener('keydown', e => {
-  if (e.key==='/' && document.activeElement!==search){ e.preventDefault(); search.focus(); }
-  if (e.key==='Escape'){ search.blur(); results.style.display='none'; isolateId=null; rebuild(); }
-});
+  // Keyboard shortcut
+  window.addEventListener('keydown',function(e){if(e.key==='/'){e.preventDefault();searchBox.focus()}if(e.key==='Escape'){searchBox.value='';searchBox.dispatchEvent(new Event('input'));searchBox.blur()}});
 
-rebuild();
+  // Fit view
+  setTimeout(function(){network.fit({animation:{duration:600,easingFunction:'easeInOutQuad'}})},300);
+
+})();
 </script>
 </body>
 </html>
