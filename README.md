@@ -18,7 +18,7 @@ The knowledge map spans the entire mailroom-dev monorepo — 9 workspace package
 ## Reading the architecture map
 
 - **Symbols** — all 4,870 code symbols; double-click any node to isolate it + its neighbors.
-- **Modules** — 462 source files aggregated; node size = symbol count; double-click a module to open its symbols.
+- **Modules** — 463 source files aggregated; node size = symbol count; double-click a module to open its symbols.
 - **Layers** — the 9 workspace packages; double-click a layer to focus it.
 - **Edge semantics** — solid = AST-extracted, **dashed amber = LLM-inferred** (graphify's edge scan, 571 edges, avg confidence 0.89; hover any edge for its relation + confidence).
 - **⚡ insights** — data-driven navigation: top **hidden connections** (LLM-inferred and cross-package edges, ranked, click to jump), **bridge nodes** spanning the most packages (click to isolate), a **spotlight** that shows only inferred edges, and a **cross-package edges only** lens.
@@ -34,7 +34,7 @@ The knowledge map spans the entire mailroom-dev monorepo — 9 workspace package
 
 ## Stats
 
-- **4,870 code symbols** · **16,161 edges** · **325 communities** · **462 files**
+- **4,870 code symbols** · **16,161 edges** · **325 communities** · **463 files**
 
 ## Rebuild
 
