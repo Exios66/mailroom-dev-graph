@@ -27,8 +27,8 @@
   .tooltip { position:absolute; background:#16162a; border:1px solid #2a2f40; border-radius:6px; padding:10px 14px; font-size:12px; pointer-events:none; z-index:20; max-width:280px; color:#c8d0dc; box-shadow:0 4px 12px rgba(0,0,0,.4); display:none; }
   .tooltip .tt-title { font-weight:600; color:#e4ecfa; margin-bottom:4px; }
   .tooltip .tt-meta { color:#6b7a8f; font-size:11px; }
-  footer { position:fixed; bottom:0; left:0; right:0; text-align:center; padding:6px; background:#0a0a0fcc; color:#3a4255; font-size:10px; z-index:10; }
-  @media(max-width:800px){ header{padding:8px 12px} #searchbox-wrap{top:48px;left:12px} #legend{bottom:8px;left:8px;padding:10px 14px} #stats{text-align:left;margin-top:0;width:auto;max-width:none} .brand{font-size:13px} }
+  #graph { width:100%; height:calc(100vh - 52px); position:absolute; top:52px; left:0; } footer { position:fixed; bottom:0; left:0; right:0; text-align:center; padding:6px; background:#0a0a0fcc; color:#3a4255; font-size:10px; z-index:10; }
+  @media(max-width:800px){ header{padding:8px 12px} #searchbox-wrap{top:48px;left:12px} #legend{bottom:8px;left:8px;padding:10px 14px} #stats{text-align:left;margin-top:0;width:auto;max-width:none} .brand{font-size:13px} #graph{height:calc(100vh - 48px)} }
 </style>
 </head>
 <body>
@@ -52,7 +52,9 @@
   var GODS = graphGods;
   var RELS = graphRels;
 
-  document.getElementById('version').innerHTML = '· %s · %s'.replace('%s','COMMIT_SHA_PLACEHOLDER').replace('%s','TODAY_PLACEHOLDER');
+  var commitSha = '998922f0';
+  var today = '2026-08-30';
+  document.getElementById('version').innerHTML = commitSha + ' ' + today;
 
   // Compute degrees
   var deg={};
